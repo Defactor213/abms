@@ -1,6 +1,6 @@
 #CS426 Agent-based Modeling and Simulation G1T1
 Consists of members:
-- 1. Belveen 
+- 1. Balveen 
 - 2. Eric
 - 3. Wilson
 
