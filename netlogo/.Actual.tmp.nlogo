@@ -267,9 +267,7 @@ to seller-selling-again
 end
 
 ; THINGS LEFT TO DO
-; 1. Family size
-; 2. Shifting the functions for the formula over
-; 3. Generating graphs and monitors
+; 1. Shifting the func
 
 
 ; Additional functions to simulate buyer and seller interactions, transactions,
