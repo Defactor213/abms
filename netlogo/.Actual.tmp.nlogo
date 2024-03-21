@@ -22,15 +22,15 @@ sellers-own[
   race
   ask-price
   selling?
+  room_type
+  family_size
 ]
 
 buyers-own[
   income
-  family_size
   race
   first_time?
   offer_price
-  room_type
 ]
 
 to setup
@@ -118,6 +118,24 @@ to setup-sellers
 
     ; Initialize other seller variables
 
+    ; -----------TO CHANGE
+
+    set family_size my-family-size
+    ;; 2,3,4,5,
+    ifelse (my-family-size <= 2) [
+      set room_type "2-room"
+    ] [
+      ifelse (my-family-size <= 3) [
+        set room_type "3-room"
+      ] [
+        ifelse (my-family-size <= 4) [
+          set room_type "4-room"
+        ] [
+          set room_type "5-room"
+        ]
+      ]
+    ]
+
     ; ----- PLACEHOLDER for ask-price initialization
     set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
 
@@ -178,9 +196,6 @@ to setup-buyers
     let std-deviation 2000 ; NEEDA CHANGE
     let my-income random-normal mean-income std-deviation
 
-    ; -----------TO CHANGE
-    let my-family-size random 5  ; random family size between 1 and 5
-
     ; PLACEHOLDER Determine if its firsttimer or not
     let first-timer? random-float 1.0 < 0.5  ; 50% chance of being a first-time buyer
     let first-timer ifelse-value (first-timer?) [true] [false]
@@ -192,7 +207,6 @@ to setup-buyers
     ; Assigning initialized attributes to each buyer
     set race my-race
     set income my-income
-    set family_size my-family-size
     set first_time? first-timer?
     set offer_price my-offer-price
 
@@ -363,16 +377,6 @@ GRAPHICS-WINDOW
 1
 ticks
 30.0
-
-TEXTBOX
-0
-0
-0
-0
-NIL
-10
-0.0
-1
 
 BUTTON
 25
@@ -597,7 +601,7 @@ MONITOR
 746
 449
 845
-495
+494
 Sold to Indians
 total_houses_sold_indian
 17
@@ -646,6 +650,26 @@ PENS
 "Indian" 1.0 0 -14070903 true "" "plot total_houses_sold_indian_average"
 "Malay" 1.0 0 -2674135 true "" "plot total_houses_sold_malay_average"
 "Others" 1.0 0 -955883 true "" "plot total_houses_sold_others_average"
+
+TEXTBOX
+34
+77
+201
+102
+;; Maybe we can add a switch to implement government policies?
+10
+0.0
+1
+
+TEXTBOX
+240
+79
+407
+104
+;; Need to add additional variables here (the slider, etc)
+10
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
