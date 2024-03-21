@@ -1,3 +1,18 @@
+globals[
+  total_houses_sold
+  total_houses_sold_chinese
+  total_houses_sold_chinese_price
+  total_houses_sold_chinese_average
+  total_houses_sold_indian
+  total_houses_sold_indian_price
+  total_houses_sold_indian_average
+  total_houses_sold_malay
+  total_houses_sold_malay_price
+  total_houses_sold_malay_average
+  total_houses_sold_others
+  total_houses_sold_others_price
+  total_houses_sold_others_average
+]
 breed [sellers seller]
 breed [buyers buyer]
 
@@ -61,7 +76,7 @@ to setup-hdb
     ; Fine-tune this formula to reduce the overall density of HDB blocks
     let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * 0.8)
     if random-float 1 < prob-hdb [
-      ;set pcolor green  ; Mark as HDB block
+      set pcolor green  ; Mark as HDB block
       setup-sellers
     ]
   ]
@@ -196,12 +211,19 @@ end
 
 ; The main simulation loop
 to go
+  set total_houses_sold 0
+  set total_houses_sold_chinese 0
+  set total_houses_sold_indian 0
+  set total_houses_sold_others 0
+  set total_houses_sold_malay 0
+
   ; Placeholder for the main simulation steps, such as moving buyers, initiating transactions.
   ask buyers [
     buyer-initiate-meeting
   ]
   tick
   seller-selling-again
+  avg_prices_by_race
 end
 
 ; The interaction between the buyer and the seller
@@ -230,6 +252,26 @@ to buyer-initiate-meeting
           set race [race] of self ; Change the race of the seller to the buyers race (since they have alr sold it)
 
         ]
+        set total_houses_sold total_houses_sold + 1
+
+        ifelse race = "Chinese"[
+          set total_houses_sold_chinese total_houses_sold_chinese + 1
+            set total_houses_sold_chinese_price total_houses_sold_chinese_price + offer_price
+        ][
+          ifelse race = "Indian" [
+              set total_houses_sold_indian total_houses_sold_indian + 1
+              set total_houses_sold_indian_price total_houses_sold_indian_price + offer_price
+          ][
+            ifelse race = "Malay" [
+                set total_houses_sold_malay total_houses_sold_malay + 1
+                set total_houses_sold_malay_price total_houses_sold_malay_price + offer_price
+            ][
+                set total_houses_sold_others total_houses_sold_others + 1
+                set total_houses_sold_others_price total_houses_sold_others_price + offer_price
+            ]
+          ]
+        ]
+
         ; print (word "Meeting initiated with seller " chosen-seller)
       ] [
         ;; If there are no affordable sellers
@@ -266,6 +308,19 @@ to seller-selling-again
   ;; else it would remain as they are not willing to sell
 end
 
+to-report houses_not_sold
+  let houses count turtles with [color = green]
+  let not_sold houses - total_houses_sold
+  report not_sold
+end
+
+to avg_prices_by_race
+  set total_houses_sold_malay_average total_houses_sold_malay_price / total_houses_sold_malay
+  set total_houses_sold_chinese_average total_houses_sold_chinese_price / total_houses_sold_chinese
+  set total_houses_sold_indian_average total_houses_sold_indian_price / total_houses_sold_indian
+  set total_houses_sold_others_average total_houses_sold_others_price / total_houses_sold_others
+end
+
 ; THINGS LEFT TO DO
 ; 1. Family size
 ; 2. Shifting the functions for the formula over
@@ -283,10 +338,10 @@ end
 ; more detailed interactions based on the project proposal.
 @#$#@#$#@
 GRAPHICS-WINDOW
-211
-10
-820
-470
+6
+131
+615
+591
 -1
 -1
 2.993
@@ -310,11 +365,11 @@ ticks
 30.0
 
 BUTTON
-12
-45
-78
-78
-NIL
+25
+16
+91
+49
+Setup
 setup
 NIL
 1
@@ -327,33 +382,22 @@ NIL
 1
 
 MONITOR
-3
-260
-96
-305
-NIL
-count turtles
-17
-1
-11
-
-MONITOR
-7
-324
-176
-369
-Number of red patches
-count patches with [pcolor = red]
+640
+143
+773
+188
+Number of Sellers Selling
+count turtles with [color = green]
 17
 1
 11
 
 BUTTON
-112
-45
-175
-78
-NIL
+105
+16
+168
+49
+Go
 go
 NIL
 1
@@ -366,10 +410,10 @@ NIL
 1
 
 MONITOR
-64
-168
-180
-213
+640
+54
+746
+99
 Number of Buyers
 count turtles with [color = blue]
 17
@@ -377,11 +421,11 @@ count turtles with [color = blue]
 11
 
 BUTTON
-35
-101
-98
-134
-NIL
+183
+16
+279
+49
+Go (forever)
 go
 T
 1
@@ -394,11 +438,11 @@ NIL
 1
 
 PLOT
-896
-45
-1439
-342
-plot 1
+958
+17
+1405
+196
+Number of Buyers, Sellers (selling and not selling)
 NIL
 NIL
 0.0
@@ -409,31 +453,209 @@ true
 true
 "" ""
 PENS
-"buyer" 1.0 0 -13791810 true "" "plot count turtles with [color = blue]"
-"seller not selling" 1.0 0 -1184463 true "" "plot count turtles with [color = yellow]"
-"seller" 1.0 0 -11085214 true "" "plot count turtles with [color = green]"
+"Buyer" 1.0 0 -13791810 true "" "plot count turtles with [color = blue]"
+"Seller not Selling" 1.0 0 -1184463 true "" "plot count turtles with [color = yellow]"
+"Seller" 1.0 0 -11085214 true "" "plot count turtles with [color = green]"
 
 MONITOR
-889
-376
-992
-421
-Number of seller
+755
+54
+853
+99
+Number of Seller
+count turtles with [color = green or color = yellow]
+17
+1
+11
+
+MONITOR
+790
+142
+938
+187
+Number of sellers not selling
+count turtles with [color = yellow]
+17
+1
+11
+
+TEXTBOX
+637
+21
+857
+55
+Number of agents in the model
+14
+0.0
+1
+
+TEXTBOX
+642
+108
+860
+142
+Number of sellers in the model
+14
+0.0
+1
+
+PLOT
+960
+225
+1409
+405
+Number of Houses 
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Total Houses " 1.0 0 -14070903 true "" "plot count turtles with [color = green]"
+"Houses Sold" 1.0 0 -11085214 true "" "plot total_houses_sold"
+"Houses Not Sold" 1.0 0 -2674135 true "" "plot houses_not_sold"
+
+MONITOR
+644
+316
+779
+361
+Total number of houses
 count turtles with [color = green]
 17
 1
 11
 
 MONITOR
-1040
-377
-1207
-422
-Number of sellers not selling
-count turtles with [color = yellow]
+754
+262
+855
+307
+Total houses sold
+total_houses_sold
 17
 1
 11
+
+MONITOR
+644
+260
+739
+305
+Houses not sold
+houses_not_sold
+17
+1
+11
+
+TEXTBOX
+644
+232
+882
+266
+Number of houses in the model
+14
+0.0
+1
+
+TEXTBOX
+646
+416
+829
+450
+Houses Sold by ethinicity 
+14
+0.0
+1
+
+MONITOR
+643
+449
+735
+494
+Sold to Chinese
+total_houses_sold_chinese
+17
+1
+11
+
+MONITOR
+746
+449
+845
+495
+Sold to Indians
+total_houses_sold_indian
+17
+1
+11
+
+MONITOR
+644
+507
+726
+552
+Sold to Malay
+total_houses_sold_malay
+17
+1
+11
+
+MONITOR
+746
+505
+830
+550
+Sold to others
+total_houses_sold_others
+17
+1
+11
+
+PLOT
+962
+424
+1395
+604
+Average Price of houses by ethnicity 
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"Chinese" 1.0 0 -11085214 true "" "plot total_houses_sold_chinese_average"
+"Indian" 1.0 0 -14070903 true "" "plot total_houses_sold_indian_average"
+"Malay" 1.0 0 -2674135 true "" "plot total_houses_sold_malay_average"
+"Others" 1.0 0 -955883 true "" "plot total_houses_sold_others_average"
+
+TEXTBOX
+34
+77
+201
+102
+;; Maybe we can add a switch to implement government policies?
+10
+0.0
+1
+
+TEXTBOX
+240
+79
+407
+104
+;; Need to add additional variables here (the slider, etc)
+10
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
