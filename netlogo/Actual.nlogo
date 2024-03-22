@@ -31,13 +31,15 @@ buyers-own[
   race
   first_time?
   offer_price
+  room_type
+  family_size
 ]
 
 to setup
 
   clear-all
   setup-hdb
-  setup-buyers
+  setup-buyers 100
   reset-ticks
 end
 
@@ -77,16 +79,15 @@ to setup-hdb
     let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * 0.8)
     if random-float 1 < prob-hdb [
       set pcolor green  ; Mark as HDB block
-      setup-sellers
+      setup-sellers 100
     ]
   ]
 
 end
 
 ; Setup the sellers
-to setup-sellers
+to setup-sellers [num-sellers]
   ;--------TO CHANGE
-  let num-sellers 100  ; Total number of sellers to create
 
   ; Initial counts for each race
   let count-chinese 0
@@ -177,9 +178,9 @@ to-report pick-race [c-chinese max-chinese c-indian max-indian c-malay max-malay
 end
 
 ; Creating buyer agents
-to setup-buyers
+to setup-buyers [num_to_create]
 
-  create-buyers 100 ; Adjust the number of buyers as needed
+  create-buyers num_to_create ; Adjust the number of buyers as needed
   [
     set shape "person"
     set color blue
@@ -203,6 +204,25 @@ to setup-buyers
     ; -----------TO CHANGE
     ; Determine the offer price of the buyer
     let my-offer-price random 50000 ;; NEEDA CHANGE
+
+    ; -----------TO CHANGE
+    let my-family-size 1 + random 5  ; random family size between 1 and 5
+    set family_size my-family-size
+    ;; 2,3,4,5,
+    ifelse (my-family-size <= 2) [
+      set room_type "2-room"
+    ] [
+      ifelse (my-family-size <= 3) [
+        set room_type "3-room"
+      ] [
+        ifelse (my-family-size <= 4) [
+          set room_type "4-room"
+        ] [
+          set room_type "5-room"
+        ]
+      ]
+    ]
+
 
     ; Assigning initialized attributes to each buyer
     set race my-race
@@ -232,12 +252,66 @@ to go
   set total_houses_sold_malay 0
 
   ; Placeholder for the main simulation steps, such as moving buyers, initiating transactions.
+
   ask buyers [
-    buyer-initiate-meeting
+    ifelse government_policy? [
+      buyer-initiate-meeting
+    ] [
+      buyer-initiate-meeting_without_government
+    ]
   ]
   tick
   seller-selling-again
   avg_prices_by_race
+
+  ask sellers [
+    setup-sellers 10
+  ]
+  ask buyers [
+    setup-buyers 10
+  ]
+
+end
+
+
+to buyer-initiate-meeting_without_government
+  ; Get all elgible sellers (if selling? is true)
+  let eligible-sellers sellers with [selling? = true]
+  ; If there are any eligible sellers
+  ifelse any? eligible-sellers [
+    ; Get the lowest ask price
+    let lowest-ask-price min [ask-price] of eligible-sellers
+    ; Get the potential sellers information
+    let potential-sellers eligible-sellers with [ask-price = lowest-ask-price]
+    ; Check if the race of the seller is the same as the buyer
+    let common-ground-filter potential-sellers with [room_type = [room_type] of self]
+    ; If there is common ground
+    ifelse any? common-ground-filter [
+      ; Check which sellerrs ask price is lower than the buyers
+      let affordable-sellers common-ground-filter with [ask-price <= [offer_price] of myself]
+      ; If there are any affordable sellers
+      ifelse any? affordable-sellers [
+        ; Choose the min affordable seller
+        let chosen-seller min-one-of affordable-sellers [ask-price]
+        ask chosen-seller [
+          set color yellow   ; Change color of the seller to yellow
+          set selling? false  ; Set the selling? variable of the seller to false
+
+        ]
+        set total_houses_sold total_houses_sold + 1
+        ; print (word "Meeting initiated with seller " chosen-seller)
+      ] [
+        ;; If there are no affordable sellers
+        print "No affordable sellers found"
+      ]
+    ] [
+      ;; No seller meets the ethnic integration policy
+      print "No sellers found with common ground"
+    ]
+  ] [
+    ;; No seller willing to sell
+    print "No eligible sellers found"
+  ]
 end
 
 ; The interaction between the buyer and the seller
@@ -251,7 +325,7 @@ to buyer-initiate-meeting
     ; Get the potential sellers information
     let potential-sellers eligible-sellers with [ask-price = lowest-ask-price]
     ; Check if the race of the seller is the same as the buyer
-    let common-ground-filter potential-sellers with [race = [race] of self]
+    let common-ground-filter potential-sellers with [race = [race] of self and room_type = [room_type] of self]
     ; If there is common ground
     ifelse any? common-ground-filter [
       ; Check which sellerrs ask price is lower than the buyers
@@ -329,10 +403,30 @@ to-report houses_not_sold
 end
 
 to avg_prices_by_race
-  set total_houses_sold_malay_average total_houses_sold_malay_price / total_houses_sold_malay
-  set total_houses_sold_chinese_average total_houses_sold_chinese_price / total_houses_sold_chinese
-  set total_houses_sold_indian_average total_houses_sold_indian_price / total_houses_sold_indian
-  set total_houses_sold_others_average total_houses_sold_others_price / total_houses_sold_others
+  ifelse total_houses_sold_malay != 0 [
+    set total_houses_sold_malay_average total_houses_sold_malay_price / total_houses_sold_malay
+  ] [
+    set total_houses_sold_malay_average 0
+  ]
+
+  ifelse total_houses_sold_chinese != 0 [
+    set total_houses_sold_chinese_average total_houses_sold_chinese_price / total_houses_sold_chinese
+  ] [
+    set total_houses_sold_chinese_average 0
+  ]
+
+  ifelse total_houses_sold_indian != 0 [
+    set total_houses_sold_indian_average total_houses_sold_indian_price / total_houses_sold_indian
+  ] [
+    set total_houses_sold_indian_average 0
+  ]
+
+  ifelse total_houses_sold_others != 0 [
+    set total_houses_sold_others_average total_houses_sold_others_price / total_houses_sold_others
+  ] [
+    set total_houses_sold_others_average 0
+  ]
+
 end
 
 ; THINGS LEFT TO DO
@@ -670,6 +764,17 @@ TEXTBOX
 10
 0.0
 1
+
+SWITCH
+336
+20
+492
+54
+government_policy?
+government_policy?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
