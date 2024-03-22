@@ -265,7 +265,6 @@ to go
   avg_prices_by_race
 
 
-
 end
 
 
@@ -424,10 +423,6 @@ to avg_prices_by_race
 
 end
 
-; THINGS LEFT TO DO
-; 1. Family size
-; 2. Shifting the functions for the formula over
-; 3. Generating graphs and monitors
 
 
 ; Additional functions to simulate buyer and seller interactions, transactions,
