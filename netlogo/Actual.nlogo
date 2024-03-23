@@ -97,10 +97,10 @@ to setup-sellers [num-sellers]
 
   ; Maximum allowed sellers for each race based on percentages
   ;-----------TO CHANGE
-  let max-chinese 0.84 * num-sellers
-  let max-indian 0.1 * num-sellers
-  let max-malay 0.22 * num-sellers
-  let max-others 0.05 * num-sellers
+  let max-chinese eip_chinese * num-sellers
+  let max-indian eip_indian * num-sellers
+  let max-malay eip_malay * num-sellers
+  let max-others eip_others * num-sellers
 
   ; Create sellers and assign their properties
   sprout-sellers num-sellers[
@@ -203,7 +203,7 @@ to setup-buyers [num_to_create]
 
     ; -----------TO CHANGE
     ; Determine the offer price of the buyer
-    let my-offer-price random 50000 ;; NEEDA CHANGE
+    let my-offer-price random 980000 + 20000
 
     ; -----------TO CHANGE
     let my-family-size 1 + random 5  ; random family size between 1 and 5
@@ -323,7 +323,15 @@ to buyer-initiate-meeting
     ; If there is common ground
     ifelse any? common-ground-filter [
       ; Check which sellerrs ask price is lower than the buyers
-      let affordable-sellers common-ground-filter with [ask-price <= [offer_price] of myself]
+      let buyer_price offer_price
+      if first_time? [
+        print(offer_price)
+        let fam_grant family_grant_discount room_type income
+        let ehg enhanced_housing_grant income
+        set buyer_price offer_price - fam_grant - ehg
+        print(word"after" buyer_price)
+      ]
+      let affordable-sellers common-ground-filter with [ask-price <= [buyer_price] of myself]
       ; If there are any affordable sellers
       ifelse any? affordable-sellers [
         ; Choose the min affordable seller
@@ -423,7 +431,85 @@ to avg_prices_by_race
 
 end
 
+to-report family_grant_discount [chosen_room_type fam_income]
+  ifelse fam_income < family_grant_income_level [
+    ifelse chosen_room_type = "2-room" or chosen_room_type = "3-room" or chosen_room_type = "4-room" [
+      report 80000
+    ] [
+      report 50000
+    ]
+  ][
+    report 0
+  ]
+end
 
+to-report enhanced_housing_grant [fam_income]
+  ifelse fam_income <= 1500[
+    report 80000
+  ][
+    ifelse fam_income <= 2000[
+      report 75000
+    ][
+      ifelse fam_income <= 2500[
+        report 70000
+      ][
+        ifelse fam_income <= 3000[
+          report 65000
+        ][
+          ifelse fam_income <= 3500[
+            report 60000
+          ][
+            ifelse fam_income <= 4000[
+              report 55000
+            ][
+              ifelse fam_income <= 4500[
+                report 50000
+              ][
+                ifelse fam_income <= 5000[
+                  report 45000
+                ][
+                  ifelse fam_income <= 5500[
+                    report 40000
+                  ][
+                    ifelse fam_income <= 6000[
+                      report 35000
+                    ][
+                      ifelse fam_income <= 6500[
+                        report 30000
+                      ][
+                        ifelse fam_income <= 7000[
+                          report 25000
+                        ][
+                          ifelse fam_income <= 7500[
+                            report 20000
+                          ][
+                            ifelse fam_income <= 8000[
+                              report 15000
+                            ][
+                              ifelse fam_income <= 8500[
+                                report 10000
+                              ][
+                                ifelse fam_income <= 9000[
+                                  report 5000
+                                ][
+                                  report 0
+                                ]
+                              ]
+                            ]
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
+end
 
 ; Additional functions to simulate buyer and seller interactions, transactions,
 ; and the effects of government policies will be needed here.
@@ -436,10 +522,10 @@ end
 ; more detailed interactions based on the project proposal.
 @#$#@#$#@
 GRAPHICS-WINDOW
-6
-131
-615
-591
+283
+10
+892
+470
 -1
 -1
 2.993
@@ -463,10 +549,10 @@ ticks
 30.0
 
 BUTTON
-25
-16
-91
-49
+18
+17
+84
+50
 Setup
 setup
 NIL
@@ -480,10 +566,10 @@ NIL
 1
 
 MONITOR
-640
-143
-773
-188
+1040
+139
+1173
+184
 Number of Sellers Selling
 count turtles with [color = green]
 17
@@ -491,10 +577,10 @@ count turtles with [color = green]
 11
 
 BUTTON
-105
-16
-168
-49
+18
+60
+81
+93
 Go
 go
 NIL
@@ -508,10 +594,10 @@ NIL
 1
 
 MONITOR
-640
-54
-746
-99
+1040
+50
+1146
+95
 Number of Buyers
 count turtles with [color = blue]
 17
@@ -519,10 +605,10 @@ count turtles with [color = blue]
 11
 
 BUTTON
-183
-16
-279
-49
+17
+105
+113
+138
 Go (forever)
 go
 T
@@ -536,10 +622,10 @@ NIL
 1
 
 PLOT
-958
-17
-1405
-196
+1358
+13
+1805
+192
 Number of Buyers, Sellers (selling and not selling)
 NIL
 NIL
@@ -556,10 +642,10 @@ PENS
 "Seller" 1.0 0 -11085214 true "" "plot count turtles with [color = green]"
 
 MONITOR
-755
-54
-853
-99
+1155
+50
+1253
+95
 Number of Seller
 count turtles with [color = green or color = yellow]
 17
@@ -567,10 +653,10 @@ count turtles with [color = green or color = yellow]
 11
 
 MONITOR
-790
-142
-938
-187
+1190
+138
+1338
+183
 Number of sellers not selling
 count turtles with [color = yellow]
 17
@@ -578,30 +664,30 @@ count turtles with [color = yellow]
 11
 
 TEXTBOX
-637
-21
-857
-55
+1037
+17
+1257
+51
 Number of agents in the model
 14
 0.0
 1
 
 TEXTBOX
-642
-108
-860
-142
+1042
+104
+1260
+138
 Number of sellers in the model
 14
 0.0
 1
 
 PLOT
-960
-225
-1409
-405
+1360
+221
+1809
+401
 Number of Houses 
 NIL
 NIL
@@ -618,10 +704,10 @@ PENS
 "Houses Not Sold" 1.0 0 -2674135 true "" "plot houses_not_sold"
 
 MONITOR
-644
-316
-779
-361
+1044
+312
+1179
+357
 Total number of houses
 count turtles with [color = green]
 17
@@ -629,10 +715,10 @@ count turtles with [color = green]
 11
 
 MONITOR
-754
-262
-855
-307
+1154
+258
+1255
+303
 Total houses sold
 total_houses_sold
 17
@@ -640,10 +726,10 @@ total_houses_sold
 11
 
 MONITOR
-644
-260
-739
-305
+1044
+256
+1139
+301
 Houses not sold
 houses_not_sold
 17
@@ -651,30 +737,30 @@ houses_not_sold
 11
 
 TEXTBOX
-644
-232
-882
-266
+1044
+228
+1282
+262
 Number of houses in the model
 14
 0.0
 1
 
 TEXTBOX
-646
-416
-829
-450
+1046
+412
+1229
+446
 Houses Sold by ethinicity 
 14
 0.0
 1
 
 MONITOR
-643
-449
-735
-494
+1043
+445
+1135
+490
 Sold to Chinese
 total_houses_sold_chinese
 17
@@ -682,10 +768,10 @@ total_houses_sold_chinese
 11
 
 MONITOR
-746
-449
-845
-494
+1146
+445
+1245
+490
 Sold to Indians
 total_houses_sold_indian
 17
@@ -693,10 +779,10 @@ total_houses_sold_indian
 11
 
 MONITOR
-644
-507
-726
-552
+1044
+503
+1126
+548
 Sold to Malay
 total_houses_sold_malay
 17
@@ -704,10 +790,10 @@ total_houses_sold_malay
 11
 
 MONITOR
-746
-505
-830
-550
+1146
+501
+1230
+546
 Sold to others
 total_houses_sold_others
 17
@@ -715,10 +801,10 @@ total_houses_sold_others
 11
 
 PLOT
-962
-424
-1395
-604
+1362
+420
+1795
+600
 Average Price of houses by ethnicity 
 NIL
 NIL
@@ -735,36 +821,101 @@ PENS
 "Malay" 1.0 0 -2674135 true "" "plot total_houses_sold_malay_average"
 "Others" 1.0 0 -955883 true "" "plot total_houses_sold_others_average"
 
-TEXTBOX
-34
-77
-201
-102
-;; Maybe we can add a switch to implement government policies?
-10
-0.0
-1
-
-TEXTBOX
-240
-79
-407
-104
-;; Need to add additional variables here (the slider, etc)
-10
-0.0
-1
-
 SWITCH
-336
-20
-492
-54
+15
+182
+171
+215
 government_policy?
 government_policy?
-1
+0
 1
 -1000
+
+SLIDER
+14
+224
+201
+257
+family_grant_income_level
+family_grant_income_level
+0
+30000
+21000.0
+1000
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+266
+129
+299
+eip_chinese
+eip_chinese
+0
+1
+0.84
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+136
+267
+252
+300
+eip_indian
+eip_indian
+0
+1
+0.1
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+309
+129
+342
+eip_malay
+eip_malay
+0
+1
+0.22
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+135
+310
+251
+343
+eip_others
+eip_others
+0
+1
+0.05
+0.1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+18
+158
+168
+176
+Government Variables
+14
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
