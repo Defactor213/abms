@@ -263,8 +263,8 @@ to go
   tick
   seller-selling-again
   avg_prices_by_race
-
-
+  ;; update-mean-offer-price-histogram
+  update-total-houses-sold-histogram
 end
 
 
@@ -509,6 +509,32 @@ to-report enhanced_housing_grant [fam_income]
       ]
     ]
   ]
+end
+
+to update-mean-offer-price-histogram
+  ; Clear existing histogram
+
+  set-current-plot "Mean Offer Price Histogram"
+  set-current-plot-pen "income"
+
+  ; Calculate mean offer price for each ethnic group
+  let mean-offer-price-chinese mean [offer_price] of buyers with [race = "Chinese"]
+  let mean-offer-price-indian mean [offer_price] of buyers with [race = "Indian"]
+  let mean-offer-price-malay mean [offer_price] of buyers with [race = "Malay"]
+  let mean-offer-price-others mean [offer_price] of buyers with [race = "Others"]
+
+  ; Create histogram
+  histogram (list mean-offer-price-chinese mean-offer-price-indian mean-offer-price-malay mean-offer-price-others)
+
+end
+
+
+to update-total-houses-sold-histogram
+  ; Clear existing histogram
+  set-current-plot "Houses Sold by Ethnicity"
+  set-current-plot-pen "sold_ethnicity"
+  ; Create histogram
+  histogram (list total_houses_sold_chinese total_houses_sold_indian total_houses_sold_malay total_houses_sold_others)
 end
 
 ; Additional functions to simulate buyer and seller interactions, transactions,
@@ -848,10 +874,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-266
-129
-299
+16
+302
+130
+335
 eip_chinese
 eip_chinese
 0
@@ -863,10 +889,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-136
-267
-252
-300
+137
+303
+253
+336
 eip_indian
 eip_indian
 0
@@ -878,10 +904,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-309
-129
-342
+16
+345
+130
+378
 eip_malay
 eip_malay
 0
@@ -893,10 +919,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-135
-310
-251
-343
+136
+346
+252
+379
 eip_others
 eip_others
 0
@@ -918,20 +944,20 @@ Government Variables
 1
 
 TEXTBOX
-14
-361
-164
-379
-Buyers Variables
+18
+276
+210
+310
+Ethinic Integration Policy
 14
 0.0
 1
 
 SLIDER
-14
-386
-172
-419
+18
+420
+176
+453
 buyer_mean_income
 buyer_mean_income
 0
@@ -941,6 +967,34 @@ buyer_mean_income
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+20
+396
+170
+414
+Affodability
+14
+0.0
+1
+
+PLOT
+694
+490
+894
+640
+Houses Sold by Ethnicity
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"sold_ethnicity" 1.0 1 -16777216 true "" ""
 
 @#$#@#$#@
 ## WHAT IS IT?
