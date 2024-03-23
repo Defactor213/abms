@@ -193,7 +193,7 @@ to setup-buyers [num_to_create]
     ;---------change the mean and std deviation for income level --------
     ; Determine the income level
     ; -----------TO CHANGE
-    let mean-income 5000
+    let mean-income buyer_mean_income
     let std-deviation 2000 ; NEEDA CHANGE
     let my-income random-normal mean-income std-deviation
 
@@ -522,10 +522,10 @@ end
 ; more detailed interactions based on the project proposal.
 @#$#@#$#@
 GRAPHICS-WINDOW
-355
-105
-964
-565
+283
+10
+892
+470
 -1
 -1
 2.993
@@ -566,10 +566,10 @@ NIL
 1
 
 MONITOR
-1040
-139
-1173
-184
+955
+141
+1088
+186
 Number of Sellers Selling
 count turtles with [color = green]
 17
@@ -594,10 +594,10 @@ NIL
 1
 
 MONITOR
-1040
-50
-1146
-95
+955
+52
+1061
+97
 Number of Buyers
 count turtles with [color = blue]
 17
@@ -622,10 +622,10 @@ NIL
 1
 
 PLOT
-1358
-13
-1805
-192
+1273
+15
+1720
+194
 Number of Buyers, Sellers (selling and not selling)
 NIL
 NIL
@@ -642,10 +642,10 @@ PENS
 "Seller" 1.0 0 -11085214 true "" "plot count turtles with [color = green]"
 
 MONITOR
-1155
-50
-1253
-95
+1070
+52
+1168
+97
 Number of Seller
 count turtles with [color = green or color = yellow]
 17
@@ -653,10 +653,10 @@ count turtles with [color = green or color = yellow]
 11
 
 MONITOR
-1190
-138
-1338
-183
+1105
+140
+1253
+185
 Number of sellers not selling
 count turtles with [color = yellow]
 17
@@ -664,30 +664,30 @@ count turtles with [color = yellow]
 11
 
 TEXTBOX
-1037
-17
-1257
-51
+952
+19
+1172
+53
 Number of agents in the model
 14
 0.0
 1
 
 TEXTBOX
-1042
-104
-1260
-138
+957
+106
+1175
+140
 Number of sellers in the model
 14
 0.0
 1
 
 PLOT
-1360
-221
-1809
-401
+1275
+223
+1724
+403
 Number of Houses 
 NIL
 NIL
@@ -704,10 +704,10 @@ PENS
 "Houses Not Sold" 1.0 0 -2674135 true "" "plot houses_not_sold"
 
 MONITOR
-1044
-312
-1179
-357
+959
+314
+1094
+359
 Total number of houses
 count turtles with [color = green]
 17
@@ -715,10 +715,10 @@ count turtles with [color = green]
 11
 
 MONITOR
-1154
-258
-1255
-303
+1069
+260
+1170
+305
 Total houses sold
 total_houses_sold
 17
@@ -726,10 +726,10 @@ total_houses_sold
 11
 
 MONITOR
-1044
-256
-1139
-301
+959
+258
+1054
+303
 Houses not sold
 houses_not_sold
 17
@@ -737,30 +737,30 @@ houses_not_sold
 11
 
 TEXTBOX
-1044
-228
-1282
-262
+959
+230
+1197
+264
 Number of houses in the model
 14
 0.0
 1
 
 TEXTBOX
-1046
-412
-1229
-446
+961
+414
+1144
+448
 Houses Sold by ethinicity 
 14
 0.0
 1
 
 MONITOR
-1043
-445
-1135
-490
+958
+447
+1050
+492
 Sold to Chinese
 total_houses_sold_chinese
 17
@@ -768,10 +768,10 @@ total_houses_sold_chinese
 11
 
 MONITOR
-1146
-445
-1245
-490
+1061
+447
+1160
+492
 Sold to Indians
 total_houses_sold_indian
 17
@@ -779,10 +779,10 @@ total_houses_sold_indian
 11
 
 MONITOR
-1044
-503
-1126
-548
+959
+505
+1041
+550
 Sold to Malay
 total_houses_sold_malay
 17
@@ -790,10 +790,10 @@ total_houses_sold_malay
 11
 
 MONITOR
-1146
-501
-1230
-546
+1061
+503
+1145
+548
 Sold to others
 total_houses_sold_others
 17
@@ -801,10 +801,10 @@ total_houses_sold_others
 11
 
 PLOT
-1362
-420
-1795
-600
+1277
+422
+1710
+602
 Average Price of houses by ethnicity 
 NIL
 NIL
@@ -822,10 +822,10 @@ PENS
 "Others" 1.0 0 -955883 true "" "plot total_houses_sold_others_average"
 
 SWITCH
-18
-170
-174
-203
+15
+182
+171
+215
 government_policy?
 government_policy?
 0
@@ -834,9 +834,9 @@ government_policy?
 
 SLIDER
 14
-213
+224
 201
-246
+257
 family_grant_income_level
 family_grant_income_level
 0
@@ -849,9 +849,9 @@ HORIZONTAL
 
 SLIDER
 15
-255
+266
 129
-288
+299
 eip_chinese
 eip_chinese
 0
@@ -864,9 +864,9 @@ HORIZONTAL
 
 SLIDER
 136
-256
+267
 252
-289
+300
 eip_indian
 eip_indian
 0
@@ -879,9 +879,9 @@ HORIZONTAL
 
 SLIDER
 15
-298
+309
 129
-331
+342
 eip_malay
 eip_malay
 0
@@ -894,15 +894,50 @@ HORIZONTAL
 
 SLIDER
 135
-299
+310
 251
-332
+343
 eip_others
 eip_others
 0
 1
 0.05
 0.1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+15
+158
+165
+176
+Government Variables
+14
+0.0
+1
+
+TEXTBOX
+19
+364
+169
+382
+Buyers Variables
+14
+0.0
+1
+
+SLIDER
+15
+389
+173
+422
+buyer_mean_income
+buyer_mean_income
+0
+100000
+2000.0
+1000
 1
 NIL
 HORIZONTAL
