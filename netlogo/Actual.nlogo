@@ -157,7 +157,7 @@ to setup-sellers [num-sellers]
     set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
 
     ; ----- PLACEHOLDER for chances of selling
-    let selling_var? random-float 1.0 < 0.5  ; 50% chance of selling the house
+    let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of selling the house
 
     set selling? selling_var?
 
@@ -207,11 +207,23 @@ to setup-buyers [num_to_create]
   [
     set shape "person"
     set color blue
-    set size 4
 
     ; Determine the buyer's race
     let races ["Chinese" "Indian" "Malay" "Others"]
     let my-race one-of races
+    ifelse my-race = "Chinese" [
+      set color sky
+    ][
+      ifelse my-race = "Indian"[
+        set color pink
+      ][
+        ifelse my-race = "Malay" [
+          set color violet
+        ][
+          set color orange
+        ]
+      ]
+    ]
 
 
     ; PLACEHOLDER Determine if its firsttimer or not
@@ -224,14 +236,18 @@ to setup-buyers [num_to_create]
     ;; 2,3,4,5,
     ifelse (my-family-size <= 2) [
       set room_type "2-room"
+      set size 4
     ] [
       ifelse (my-family-size <= 3) [
         set room_type "3-room"
+        set size 5
       ] [
         ifelse (my-family-size <= 4) [
           set room_type "4-room"
+          set size 6
         ] [
           set room_type "5-room"
+          set size 7
         ]
       ]
     ]
@@ -318,7 +334,7 @@ to go
     ]
   ]
 
-  setup-buyers 10
+  setup-buyers number_of_buyers
 end
 
 to buyer-initiate-meeting
@@ -650,7 +666,7 @@ to seller-selling-again
   ask sellers with [selling? = true] [
     ask one-of sellers-here [
       ; -----------TO CHANGE
-      let selling_var? random-float 1.0 < 0.2  ; 50% chance of being a first-time buyer
+      let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of being a first-time buyer
 
       ;; If seller is willing to sell again
       if selling?[
@@ -848,9 +864,9 @@ NIL
 1
 
 MONITOR
-955
+913
 141
-1088
+1046
 186
 Number of Sellers Selling
 count turtles with [color = green]
@@ -859,10 +875,10 @@ count turtles with [color = green]
 11
 
 BUTTON
+92
 18
-60
-81
-93
+155
+51
 Go
 go
 NIL
@@ -876,9 +892,9 @@ NIL
 1
 
 MONITOR
-955
+913
 52
-1061
+1019
 97
 Number of Buyers
 count turtles with [color = blue]
@@ -887,10 +903,10 @@ count turtles with [color = blue]
 11
 
 BUTTON
-17
-105
-113
-138
+163
+18
+259
+51
 Go (forever)
 go
 T
@@ -904,9 +920,9 @@ NIL
 1
 
 PLOT
-1273
+1231
 15
-1720
+1678
 194
 Number of Buyers, Sellers (selling and not selling)
 NIL
@@ -924,9 +940,9 @@ PENS
 "Seller" 1.0 0 -11085214 true "" "plot count turtles with [color = green]"
 
 MONITOR
-1070
+1028
 52
-1168
+1126
 97
 Number of Seller
 count turtles with [color = green or color = yellow]
@@ -935,9 +951,9 @@ count turtles with [color = green or color = yellow]
 11
 
 MONITOR
-1105
+1063
 140
-1253
+1211
 185
 Number of sellers not selling
 count turtles with [color = yellow]
@@ -946,9 +962,9 @@ count turtles with [color = yellow]
 11
 
 TEXTBOX
-952
+910
 19
-1172
+1130
 53
 Number of agents in the model
 14
@@ -956,9 +972,9 @@ Number of agents in the model
 1
 
 TEXTBOX
-957
+915
 106
-1175
+1133
 140
 Number of sellers in the model
 14
@@ -966,9 +982,9 @@ Number of sellers in the model
 1
 
 PLOT
-1275
+1233
 223
-1724
+1682
 403
 Number of Houses 
 NIL
@@ -986,9 +1002,9 @@ PENS
 "Houses Not Sold" 1.0 0 -2674135 true "" "plot houses_not_sold"
 
 MONITOR
-959
+917
 314
-1094
+1052
 359
 Total number of houses
 count turtles with [color = green]
@@ -997,9 +1013,9 @@ count turtles with [color = green]
 11
 
 MONITOR
-1069
+1027
 260
-1170
+1128
 305
 Total houses sold
 total_houses_sold
@@ -1008,9 +1024,9 @@ total_houses_sold
 11
 
 MONITOR
-959
+917
 258
-1054
+1012
 303
 Houses not sold
 houses_not_sold
@@ -1019,9 +1035,9 @@ houses_not_sold
 11
 
 TEXTBOX
-959
+917
 230
-1197
+1155
 264
 Number of houses in the model
 14
@@ -1029,9 +1045,9 @@ Number of houses in the model
 1
 
 TEXTBOX
-961
+919
 414
-1144
+1102
 448
 Houses Sold by ethinicity 
 14
@@ -1039,9 +1055,9 @@ Houses Sold by ethinicity
 1
 
 MONITOR
-958
+916
 447
-1050
+1008
 492
 Sold to Chinese
 total_houses_sold_chinese
@@ -1050,9 +1066,9 @@ total_houses_sold_chinese
 11
 
 MONITOR
-1061
+1019
 447
-1160
+1118
 492
 Sold to Indians
 total_houses_sold_indian
@@ -1061,9 +1077,9 @@ total_houses_sold_indian
 11
 
 MONITOR
-959
+917
 505
-1041
+999
 550
 Sold to Malay
 total_houses_sold_malay
@@ -1072,9 +1088,9 @@ total_houses_sold_malay
 11
 
 MONITOR
-1061
+1019
 503
-1145
+1103
 548
 Sold to others
 total_houses_sold_others
@@ -1083,9 +1099,9 @@ total_houses_sold_others
 11
 
 PLOT
-1277
+1235
 422
-1710
+1668
 602
 Average Price of houses by ethnicity 
 NIL
@@ -1104,10 +1120,10 @@ PENS
 "Others" 1.0 0 -955883 true "" "plot total_houses_sold_others_average"
 
 SWITCH
-15
-182
-171
-215
+19
+178
+175
+211
 government_policy?
 government_policy?
 0
@@ -1115,25 +1131,25 @@ government_policy?
 -1000
 
 SLIDER
-14
-224
-201
-257
+18
+220
+205
+253
 family_grant_income_level
 family_grant_income_level
 0
 30000
-21000.0
+30000.0
 1000
 1
 NIL
 HORIZONTAL
 
 SLIDER
-15
-344
-129
-377
+20
+335
+134
+368
 eip_chinese
 eip_chinese
 0
@@ -1145,10 +1161,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-136
-345
-252
-378
+140
+336
+256
+369
 eip_indian
 eip_indian
 0
@@ -1160,10 +1176,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-387
-129
-420
+20
+378
+134
+411
 eip_malay
 eip_malay
 0
@@ -1175,45 +1191,45 @@ NIL
 HORIZONTAL
 
 SLIDER
-135
-388
-251
-421
+140
+379
+256
+412
 eip_others
 eip_others
 0
 1
-0.15
+1.0
 0.1
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-15
-158
-165
-176
+19
+154
+169
+172
 Government Variables
 14
 0.0
 1
 
 TEXTBOX
-18
-276
-210
-310
+23
+267
+215
+301
 Ethinic Integration Policy
 14
 0.0
 1
 
 TEXTBOX
-19
-438
-169
-456
+24
+425
+174
+443
 Affodability
 14
 0.0
@@ -1238,10 +1254,10 @@ PENS
 "sold_ethnicity" 1.0 1 -16777216 true "" ""
 
 SWITCH
-16
-301
-203
-334
+20
+292
+207
+325
 ethnic-integration_policy?
 ethnic-integration_policy?
 0
@@ -1249,10 +1265,10 @@ ethnic-integration_policy?
 -1000
 
 SLIDER
-16
-464
-174
-497
+20
+450
+178
+483
 inflation
 inflation
 0
@@ -1262,6 +1278,46 @@ inflation
 1
 %
 HORIZONTAL
+
+SLIDER
+18
+107
+190
+140
+number_of_buyers
+number_of_buyers
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+18
+63
+190
+96
+prob_seller_selling
+prob_seller_selling
+0
+1
+0.1
+0.05
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+278
+476
+428
+551
+Legend:\nChinese: Sky\nIndian: Pink\nMalay: Violet\nOthers: Orange\n
+12
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
