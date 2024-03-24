@@ -193,7 +193,7 @@ to setup-buyers [num_to_create]
     ;---------change the mean and std deviation for income level --------
     ; Determine the income level
     ; -----------TO CHANGE
-    let mean-income 20000
+    let mean-income
     let std-deviation 2000 ; NEEDA CHANGE
     let my-income random-normal mean-income std-deviation
 
@@ -1174,6 +1174,21 @@ Ethinic Integration Policy
 0.0
 1
 
+SLIDER
+17
+462
+175
+495
+buyer_mean_income
+buyer_mean_income
+0
+100000
+21000.0
+1000
+1
+NIL
+HORIZONTAL
+
 TEXTBOX
 19
 438
@@ -1214,10 +1229,10 @@ ethnic-integration_policy?
 -1000
 
 SLIDER
-16
-464
-174
-497
+18
+513
+176
+546
 inflation
 inflation
 0
