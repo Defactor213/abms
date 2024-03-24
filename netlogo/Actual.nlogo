@@ -1,3 +1,5 @@
+extensions [rnd]
+
 globals[
   total_houses_sold
   total_houses_sold_chinese
@@ -85,6 +87,20 @@ to setup-hdb
 
 end
 
+to-report pick-household-size
+  let items [1 2 3 4 5 6]
+  let weights [0.155 0.245 0.22 0.2 0.11 0.07]
+
+  ; Combine the items and weights into pairs
+  let pairs (map [ [i w] -> (list i w) ] items weights)
+
+  ; Use rnd:weighted-one-of-list to pick an item based on weights
+  let chosen-pair rnd:weighted-one-of-list pairs [ [p] -> last p ]
+
+  ; Report the first item of the chosen pair, which is the household size
+  report first chosen-pair
+end
+
 ; Setup the sellers
 to setup-sellers [num-sellers]
   ;--------TO CHANGE
@@ -120,7 +136,7 @@ to setup-sellers [num-sellers]
     ; Initialize other seller variables
 
     ; -----------TO CHANGE
-    let my-family-size 1 + random 5  ; random family size between 1 and 5
+    let my-family-size pick-household-size  ; random fammily size between 1-6
     set family_size my-family-size
     ;; 2,3,4,5,
     ifelse (my-family-size <= 2) [
@@ -180,6 +196,13 @@ end
 ; Creating buyer agents
 to setup-buyers [num_to_create]
 
+  let income-brackets [
+      ["HDB 1- & 2-Room Flats" 1879 0.056]
+      ["HDB 3-Room Flats" 4800 0.244]
+      ["HDB 4-Room Flats" 6483 0.388]
+      ["HDB 5-Room & Executive Flats" 9186 0.312]
+    ]
+
   create-buyers num_to_create ; Adjust the number of buyers as needed
   [
     set shape "person"
@@ -190,23 +213,13 @@ to setup-buyers [num_to_create]
     let races ["Chinese" "Indian" "Malay" "Others"]
     let my-race one-of races
 
-    ;---------change the mean and std deviation for income level --------
-    ; Determine the income level
-    ; -----------TO CHANGE
-    let mean-income 20000
-    let std-deviation 2000 ; NEEDA CHANGE
-    let my-income random-normal mean-income std-deviation
 
     ; PLACEHOLDER Determine if its firsttimer or not
     let first-timer? random-float 1.0 < 0.5  ; 50% chance of being a first-time buyer
     let first-timer ifelse-value (first-timer?) [true] [false]
 
     ; -----------TO CHANGE
-    ; Determine the offer price of the buyer
-    let my-offer-price random 980000 + 20000
-
-    ; -----------TO CHANGE
-    let my-family-size 1 + random 5  ; random family size between 1 and 5
+    let my-family-size pick-household-size; random fammily size between 1-6
     set family_size my-family-size
     ;; 2,3,4,5,
     ifelse (my-family-size <= 2) [
@@ -222,6 +235,28 @@ to setup-buyers [num_to_create]
         ]
       ]
     ]
+    let my-income 0
+    ifelse (my-family-size <= 2)[
+      let std-deviation 0.1 * 1879
+      set my-income random-normal 1879 std-deviation
+    ][
+      ifelse (my-family-size <= 3) [
+        let std-deviation 0.1 * 4800
+        set my-income random-normal 4800 std-deviation
+      ] [
+        ifelse (my-family-size <= 4) [
+          let std-deviation 0.1 * 6483
+          set my-income random-normal 6483 std-deviation
+        ] [
+          let std-deviation 0.1 * 9186
+          set my-income random-normal 9186 std-deviation
+        ]
+      ]
+    ]
+
+        ; -----------TO CHANGE
+    ; Determine the offer price of the buyer
+    let my-offer-price random 980000 + 20000
 
 
     ; Assigning initialized attributes to each buyer
