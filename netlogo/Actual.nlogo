@@ -26,6 +26,7 @@ sellers-own[
   selling?
   room_type
   family_size
+  lease_years
 ]
 
 buyers-own[
@@ -122,6 +123,9 @@ to setup-sellers [num-sellers]
   sprout-sellers num-sellers[
     set shape "house"
     set color green
+
+    ; Randomly assign the lease year to the blocks
+    let lease-years random 50 + 50
 
     ; Determine the seller's race
     let my-race pick-race count-chinese max-chinese count-indian max-indian count-malay max-malay count-others max-others
@@ -323,6 +327,7 @@ to go
 
   ]
   tick
+  decrease_lease_year
   seller-selling-again
   avg_prices_by_race
   ;; update-mean-offer-price-histogram
@@ -335,6 +340,16 @@ to go
   ]
 
   setup-buyers number_of_buyers
+end
+
+to decrease_lease_year
+  ask sellers [
+    set lease_years lease_years - 1
+    if lease_years = 0 [
+      set lease_years 99
+    ]
+  ]
+
 end
 
 to buyer-initiate-meeting

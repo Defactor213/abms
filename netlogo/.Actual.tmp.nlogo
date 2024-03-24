@@ -26,6 +26,7 @@ sellers-own[
   selling?
   room_type
   family_size
+  lease_years
 ]
 
 buyers-own[
@@ -81,7 +82,7 @@ to setup-hdb
     let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * 0.5)
     if random-float 1 < prob-hdb [
       set pcolor green  ; Mark as HDB block
-      setup-sellers 100
+      setup-sellers
     ]
   ]
 
@@ -122,6 +123,9 @@ to setup-sellers [num-sellers]
   sprout-sellers num-sellers[
     set shape "house"
     set color green
+
+    ; Randomly assign the lease year to the blocks
+    set lease_years random 50 + 50
 
     ; Determine the seller's race
     let my-race pick-race count-chinese max-chinese count-indian max-indian count-malay max-malay count-others max-others
@@ -323,6 +327,7 @@ to go
 
   ]
   tick
+  decrease_lease_year
   seller-selling-again
   avg_prices_by_race
   ;; update-mean-offer-price-histogram
@@ -335,6 +340,16 @@ to go
   ]
 
   setup-buyers number_of_buyers
+end
+
+to decrease_lease_year
+  ask sellers [
+    set lease_years lease_years - 1
+    if lease_years = 0 [
+      set lease_years 99
+    ]
+  ]
+
 end
 
 to buyer-initiate-meeting
@@ -846,16 +861,6 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
-TEXTBOX
-0
-0
-0
-0
-NIL
-10
-0.0
-1
-
 BUTTON
 18
 17
@@ -907,7 +912,7 @@ MONITOR
 1019
 97
 Number of Buyers
-count turtles with [color = blue]
+count turtles with [color = sky or color = violet or color = pink or color = orange]
 17
 1
 11
@@ -1318,6 +1323,16 @@ prob_seller_selling
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+278
+476
+428
+551
+Legend:\nChinese: Sky\nIndian: Pink\nMalay: Violet\nOthers: Orange\n
+12
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
