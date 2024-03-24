@@ -13,10 +13,10 @@ globals[
   total_houses_sold_others_price
   total_houses_sold_others_average
 ]
+
 breed [sellers seller]
 breed [buyers buyer]
 
-;---------@ERIC add what u need--------
 sellers-own[
   seller-id
   race
@@ -36,7 +36,6 @@ buyers-own[
 ]
 
 to setup
-
   clear-all
   setup-hdb
   setup-buyers 100
@@ -79,7 +78,7 @@ to setup-hdb
     let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * 0.5)
     if random-float 1 < prob-hdb [
       set pcolor green  ; Mark as HDB block
-      setup-sellers 100
+
     ]
   ]
 
@@ -266,6 +265,11 @@ to go
   ;; update-mean-offer-price-histogram
   update-total-houses-sold-histogram
 
+  if ticks mod 1000 = 0 [
+    ask buyers [
+      set income (income * (1 + inflation))
+    ]
+  ]
 
   setup-buyers 10
 end
