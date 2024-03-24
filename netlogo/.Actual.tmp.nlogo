@@ -266,6 +266,7 @@ to go
   ;; update-mean-offer-price-histogram
   update-total-houses-sold-histogram
 
+
   setup-buyers 10
 end
 
@@ -864,9 +865,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
+15
 344
-130
+129
 377
 eip_chinese
 eip_chinese
@@ -879,9 +880,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-137
+136
 345
-253
+252
 378
 eip_indian
 eip_indian
@@ -894,9 +895,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
+15
 387
-130
+129
 420
 eip_malay
 eip_malay
@@ -909,9 +910,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-136
+135
 388
-252
+251
 421
 eip_others
 eip_others
@@ -944,9 +945,9 @@ Ethinic Integration Policy
 1
 
 SLIDER
-18
+17
 462
-176
+175
 495
 buyer_mean_income
 buyer_mean_income
@@ -959,9 +960,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-20
+19
 438
-170
+169
 456
 Affodability
 14
@@ -987,15 +988,30 @@ PENS
 "sold_ethnicity" 1.0 1 -16777216 true "" ""
 
 SWITCH
-242
-513
-429
-546
+16
+301
+203
+334
 ethnic-integration_policy?
 ethnic-integration_policy?
 1
 1
 -1000
+
+SLIDER
+18
+513
+176
+546
+inflation
+inflation
+0
+10
+2.0
+0.1
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

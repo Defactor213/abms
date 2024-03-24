@@ -266,6 +266,12 @@ to go
   ;; update-mean-offer-price-histogram
   update-total-houses-sold-histogram
 
+  if ticks mod 1000 = 0 [
+    ask buyers [
+      set income (income * (1 + inflation))
+    ]
+  ]
+
   setup-buyers 10
 end
 
@@ -996,6 +1002,21 @@ ethnic-integration_policy?
 1
 1
 -1000
+
+SLIDER
+18
+513
+176
+546
+inflation
+inflation
+0
+10
+2.0
+0.1
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
