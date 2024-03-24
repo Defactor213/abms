@@ -76,7 +76,7 @@ to setup-hdb
   ask patches with [pcolor = red] [
     let distance-from-center distancexy center-x center-y
     ; Fine-tune this formula to reduce the overall density of HDB blocks
-    let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * 0.8)
+    let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * 0.5)
     if random-float 1 < prob-hdb [
       set pcolor green  ; Mark as HDB block
       setup-sellers 100
@@ -265,6 +265,8 @@ to go
   avg_prices_by_race
   ;; update-mean-offer-price-histogram
   update-total-houses-sold-histogram
+
+  setup-buyers 10
 end
 
 
@@ -511,30 +513,18 @@ to-report enhanced_housing_grant [fam_income]
   ]
 end
 
-to update-mean-offer-price-histogram
-  ; Clear existing histogram
-
-  set-current-plot "Mean Offer Price Histogram"
-  set-current-plot-pen "income"
-
-  ; Calculate mean offer price for each ethnic group
-  let mean-offer-price-chinese mean [offer_price] of buyers with [race = "Chinese"]
-  let mean-offer-price-indian mean [offer_price] of buyers with [race = "Indian"]
-  let mean-offer-price-malay mean [offer_price] of buyers with [race = "Malay"]
-  let mean-offer-price-others mean [offer_price] of buyers with [race = "Others"]
-
-  ; Create histogram
-  histogram (list mean-offer-price-chinese mean-offer-price-indian mean-offer-price-malay mean-offer-price-others)
-
-end
-
-
 to update-total-houses-sold-histogram
   ; Clear existing histogram
   set-current-plot "Houses Sold by Ethnicity"
   set-current-plot-pen "sold_ethnicity"
+  let houses_sold []
+  set houses_sold lput total_houses_sold_chinese houses_sold
+  set houses_sold lput total_houses_sold_indian houses_sold
+  set houses_sold lput total_houses_sold_malay houses_sold
+  set houses_sold lput total_houses_sold_others houses_sold
+
   ; Create histogram
-  histogram (list total_houses_sold_chinese total_houses_sold_indian total_houses_sold_malay total_houses_sold_others)
+  histogram houses_sold
 end
 
 ; Additional functions to simulate buyer and seller interactions, transactions,
@@ -874,10 +864,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
-302
-130
-335
+15
+344
+129
+377
 eip_chinese
 eip_chinese
 0
@@ -889,10 +879,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-137
-303
-253
-336
+136
+345
+252
+378
 eip_indian
 eip_indian
 0
@@ -904,10 +894,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
-345
-130
-378
+15
+387
+129
+420
 eip_malay
 eip_malay
 0
@@ -919,10 +909,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-136
-346
-252
-379
+135
+388
+251
+421
 eip_others
 eip_others
 0
@@ -954,25 +944,25 @@ Ethinic Integration Policy
 1
 
 SLIDER
-18
-420
-176
-453
+17
+462
+175
+495
 buyer_mean_income
 buyer_mean_income
 0
 100000
-2000.0
+21000.0
 1000
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-20
-396
-170
-414
+19
+438
+169
+456
 Affodability
 14
 0.0
@@ -995,6 +985,17 @@ false
 "" ""
 PENS
 "sold_ethnicity" 1.0 1 -16777216 true "" ""
+
+SWITCH
+16
+301
+203
+334
+ethnic-integration_policy?
+ethnic-integration_policy?
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
