@@ -193,7 +193,7 @@ to setup-buyers [num_to_create]
     ;---------change the mean and std deviation for income level --------
     ; Determine the income level
     ; -----------TO CHANGE
-    let mean-income buyer_mean_income
+    let mean-income 20000
     let std-deviation 2000 ; NEEDA CHANGE
     let my-income random-normal mean-income std-deviation
 
@@ -254,11 +254,22 @@ to go
   ; Placeholder for the main simulation steps, such as moving buyers, initiating transactions.
 
   ask buyers [
-    ifelse government_policy? [
+    ifelse government_policy? and ethnic-integration_policy?[
       buyer-initiate-meeting
     ] [
-      buyer-initiate-meeting_without_government
+      ;; if there is no ethnic intergation policy only
+      ifelse not ethnic-integration_policy? and government_policy?[
+        buyer-initiate-meeting_no_eip
+      ][
+        ;; if there is no government policy only
+        ifelse ethnic-integration_policy? and not government_policy?[
+          buyer-initiate-meeting_no_government
+        ][
+          buyer-initiate-meeting_no_eip_no_governemnt
+        ]
+      ]
     ]
+
   ]
   tick
   seller-selling-again
@@ -275,76 +286,72 @@ to go
   setup-buyers 10
 end
 
-
-to buyer-initiate-meeting_without_government
-  ; Get all elgible sellers (if selling? is true)
-  let eligible-sellers sellers with [selling? = true]
-  ; If there are any eligible sellers
-  ifelse any? eligible-sellers [
-    ; Get the lowest ask price
-    let lowest-ask-price min [ask-price] of eligible-sellers
-    ; Get the potential sellers information
-    let potential-sellers eligible-sellers with [ask-price = lowest-ask-price]
-    ; Check if the race of the seller is the same as the buyer
-    let common-ground-filter potential-sellers with [room_type = [room_type] of self]
-    ; If there is common ground
-    ifelse any? common-ground-filter [
-      ; Check which sellerrs ask price is lower than the buyers
-      let affordable-sellers common-ground-filter with [ask-price <= [offer_price] of myself]
-      ; If there are any affordable sellers
-      ifelse any? affordable-sellers [
-        ; Choose the min affordable seller
-        let chosen-seller min-one-of affordable-sellers [ask-price]
-        ask chosen-seller [
-          set color yellow   ; Change color of the seller to yellow
-          set selling? false  ; Set the selling? variable of the seller to false
-
-        ]
-        set total_houses_sold total_houses_sold + 1
-        ; print (word "Meeting initiated with seller " chosen-seller)
-      ] [
-        ;; If there are no affordable sellers
-        print "No affordable sellers found"
-      ]
-    ] [
-      ;; No seller meets the ethnic integration policy
-      print "No sellers found with common ground"
-    ]
-  ] [
-    ;; No seller willing to sell
-    print "No eligible sellers found"
-  ]
-end
-
-; The interaction between the buyer and the seller
 to buyer-initiate-meeting
-  ; Get all elgible sellers (if selling? is true)
+  print("buyer-initiate-meeting")
+  ; Get all eligible sellers (if selling? is true)
   let eligible-sellers sellers with [selling? = true]
   ; If there are any eligible sellers
   ifelse any? eligible-sellers [
-    ; Get the lowest ask price
-    let lowest-ask-price min [ask-price] of eligible-sellers
-    ; Get the potential sellers information
-    let potential-sellers eligible-sellers with [ask-price = lowest-ask-price]
-    ; Check if the race of the seller is the same as the buyer
-    let common-ground-filter potential-sellers with [race = [race] of self and room_type = [room_type] of self]
-    ; If there is common ground
-    ifelse any? common-ground-filter [
-      ; Check which sellerrs ask price is lower than the buyers
+    ; Check if the sellers have the same room type as the buyers
+    let same_room_type eligible-sellers with [room_type = [room_type] of self]
+    ; Calculate the grant that the buyers would get (their new offer price)
+    ifelse any? same_room_type [
       let buyer_price offer_price
       if first_time? [
-        print(offer_price)
         let fam_grant family_grant_discount room_type income
         let ehg enhanced_housing_grant income
         set buyer_price offer_price - fam_grant - ehg
-        print(word"after" buyer_price)
+        print (word "After grant: " buyer_price)
       ]
-      let affordable-sellers common-ground-filter with [ask-price <= [buyer_price] of myself]
-      ; If there are any affordable sellers
-      ifelse any? affordable-sellers [
-        ; Choose the min affordable seller
-        let chosen-seller min-one-of affordable-sellers [ask-price]
-        ask chosen-seller [
+      ; Check if the sellers' ask price <= buyer's offer price
+      print(word "same_room_type" same_room_type)
+
+      let max_ask_price max [ask-price] of eligible-sellers
+      let lowest_ask_price max_ask_price
+      let lowest_ask_seller nobody
+
+      ask same_room_type with [ask-price <= buyer_price][
+        ; Get the other sellers on the same patch as the current_seller
+        let other_sellers other turtles-on patch-here
+        let my-list sort (turtle-set other_sellers)
+
+          ; Initialize counters for each ethnicity
+          let count_chinese 0
+          let count_indian 0
+          let count_malay 0
+          let count_others 0
+          ; Loop through each other seller
+          foreach my-list [other_seller ->
+            ; Check the ethnicity of the other_seller and update the corresponding counter
+            if [race] of other_seller = "Chinese" [
+              set count_chinese count_chinese + 1
+            ]
+            if [race] of other_seller = "Indian" [
+              set count_indian count_indian + 1
+            ]
+            if [race] of other_seller = "Malay" [
+              set count_malay count_malay + 1
+            ]
+            if [race] of other_seller = "Others" [
+              set count_others count_others + 1
+            ]
+          ]
+
+          ;; from the list of sellers check what races they are able to sell to
+          let races_to_sell_to eip_checker count_chinese count_indian count_malay count_others
+
+          ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
+        if member? [race] of self races_to_sell_to and ask-price <= lowest_ask_price [
+          set lowest_ask_price ask-price
+          set lowest_ask_seller self
+        ]
+
+        ]
+
+      print(word"sold to" lowest_ask_seller)
+
+      if lowest_ask_seller != nobody[
+          ask lowest_ask_seller [
           set color yellow   ; Change color of the seller to yellow
           set selling? false  ; Set the selling? variable of the seller to false
           set race [race] of self ; Change the race of the seller to the buyers race (since they have alr sold it)
@@ -369,21 +376,239 @@ to buyer-initiate-meeting
             ]
           ]
         ]
+      ]
 
-        ; print (word "Meeting initiated with seller " chosen-seller)
       ] [
-        ;; If there are no affordable sellers
         print "No affordable sellers found"
       ]
     ] [
-      ;; No seller meets the ethnic integration policy
-      print "No sellers found with common ground"
+      print "No sellers with the same room type"
     ]
+end
+
+
+to buyer-initiate-meeting_no_government
+  print("buyer-initiate-meeting_no_government")
+  ; Get all eligible sellers (if selling? is true)
+  let eligible-sellers sellers with [selling? = true]
+  ; If there are any eligible sellers
+  ifelse any? eligible-sellers [
+    ; Check if the sellers have the same room type as the buyers
+    let same_room_type eligible-sellers with [room_type = [room_type] of self]
+    ; Calculate the grant that the buyers would get (their new offer price)
+    ifelse any? same_room_type [
+      let buyer_price offer_price
+      ; Check if the sellers' ask price <= buyer's offer price
+      print(word "same_room_type" same_room_type)
+
+      let max_ask_price max [ask-price] of eligible-sellers
+      let lowest_ask_price max_ask_price
+      let lowest_ask_seller nobody
+
+      ask same_room_type with [ask-price <= buyer_price][
+        ; Get the other sellers on the same patch as the current_seller
+        let other_sellers other turtles-on patch-here
+        let my-list sort (turtle-set other_sellers)
+
+          ; Initialize counters for each ethnicity
+          let count_chinese 0
+          let count_indian 0
+          let count_malay 0
+          let count_others 0
+          ; Loop through each other seller
+          foreach my-list [other_seller ->
+            ; Check the ethnicity of the other_seller and update the corresponding counter
+            if [race] of other_seller = "Chinese" [
+              set count_chinese count_chinese + 1
+            ]
+            if [race] of other_seller = "Indian" [
+              set count_indian count_indian + 1
+            ]
+            if [race] of other_seller = "Malay" [
+              set count_malay count_malay + 1
+            ]
+            if [race] of other_seller = "Others" [
+              set count_others count_others + 1
+            ]
+          ]
+
+          ;; from the list of sellers check what races they are able to sell to
+          let races_to_sell_to eip_checker count_chinese count_indian count_malay count_others
+
+          ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
+        if member? [race] of self races_to_sell_to and ask-price <= lowest_ask_price [
+          set lowest_ask_price ask-price
+          set lowest_ask_seller self
+        ]
+
+        ]
+
+      print(word"sold to" lowest_ask_seller)
+
+      if lowest_ask_seller != nobody[
+          ask lowest_ask_seller [
+          set color yellow   ; Change color of the seller to yellow
+          set selling? false  ; Set the selling? variable of the seller to false
+          set race [race] of self ; Change the race of the seller to the buyers race (since they have alr sold it)
+
+        ]
+        set total_houses_sold total_houses_sold + 1
+
+        ifelse race = "Chinese"[
+          set total_houses_sold_chinese total_houses_sold_chinese + 1
+            set total_houses_sold_chinese_price total_houses_sold_chinese_price + offer_price
+        ][
+          ifelse race = "Indian" [
+              set total_houses_sold_indian total_houses_sold_indian + 1
+              set total_houses_sold_indian_price total_houses_sold_indian_price + offer_price
+          ][
+            ifelse race = "Malay" [
+                set total_houses_sold_malay total_houses_sold_malay + 1
+                set total_houses_sold_malay_price total_houses_sold_malay_price + offer_price
+            ][
+                set total_houses_sold_others total_houses_sold_others + 1
+                set total_houses_sold_others_price total_houses_sold_others_price + offer_price
+            ]
+          ]
+        ]
+      ]
+
+      ] [
+        print "No affordable sellers found"
+      ]
+    ] [
+      print "No sellers with the same room type"
+    ]
+end
+
+to buyer-initiate-meeting_no_eip
+  print("buyer-initiate-meeting_no_eip")
+  ; Get all eligible sellers (if selling? is true)
+  let eligible-sellers sellers with [selling? = true]
+  ; If there are any eligible sellers
+  ifelse any? eligible-sellers [
+    ; Check if the sellers have the same room type as the buyers
+    let same_room_type eligible-sellers with [room_type = [room_type] of self]
+    ; Calculate the grant that the buyers would get (their new offer price)
+    ifelse any? same_room_type [
+      let buyer_price offer_price
+      if first_time? [
+        let fam_grant family_grant_discount room_type income
+        let ehg enhanced_housing_grant income
+        set buyer_price offer_price - fam_grant - ehg
+        print (word "After grant: " buyer_price)
+      ]
+      ; Check if the sellers' ask price <= buyer's offer price
+      print(word "same_room_type" same_room_type)
+
+      let max_ask_price max [ask-price] of eligible-sellers
+      let lowest_ask_price max_ask_price
+      let lowest_ask_seller nobody
+
+      ask same_room_type with [ask-price <= buyer_price][
+        ;; check if the ask_price is lower than the previous agent
+        if ask-price <= lowest_ask_price [
+          set lowest_ask_price ask-price
+          set lowest_ask_seller self
+        ]
+
+      ]
+
+      print(word"sold to" lowest_ask_seller)
+
+      if lowest_ask_seller != nobody[
+        ask lowest_ask_seller [
+          set color yellow   ; Change color of the seller to yellow
+          set selling? false  ; Set the selling? variable of the seller to false
+          set race [race] of self ; Change the race of the seller to the buyers race (since they have alr sold it)
+
+        ]
+        set total_houses_sold total_houses_sold + 1
+      ]
+    ][
+      print "No affordable sellers found"
+    ]
+
   ] [
-    ;; No seller willing to sell
-    print "No eligible sellers found"
+    print "No affordable sellers found"
   ]
 end
+
+to buyer-initiate-meeting_no_eip_no_governemnt
+  print("buyer-initiate-meeting_no_eip_no_governemnt")
+  ; Get all eligible sellers (if selling? is true)
+  let eligible-sellers sellers with [selling? = true]
+  ; If there are any eligible sellers
+  ifelse any? eligible-sellers [
+    ; Check if the sellers have the same room type as the buyers
+    let same_room_type eligible-sellers with [room_type = [room_type] of self]
+    ; Calculate the grant that the buyers would get (their new offer price)
+    ifelse any? same_room_type [
+      let buyer_price offer_price
+
+      ; Check if the sellers' ask price <= buyer's offer price
+      print(word "same_room_type" same_room_type)
+
+      let max_ask_price max [ask-price] of eligible-sellers
+      let lowest_ask_price max_ask_price
+      let lowest_ask_seller nobody
+
+      ask same_room_type with [ask-price <= buyer_price][
+        ;; check if the ask_price is lower than the previous agent
+        if ask-price <= lowest_ask_price [
+          set lowest_ask_price ask-price
+          set lowest_ask_seller self
+        ]
+
+      ]
+
+      print(word"sold to" lowest_ask_seller)
+
+      if lowest_ask_seller != nobody[
+        ask lowest_ask_seller [
+          set color yellow   ; Change color of the seller to yellow
+          set selling? false  ; Set the selling? variable of the seller to false
+          set race [race] of self ; Change the race of the seller to the buyers race (since they have alr sold it)
+
+        ]
+        set total_houses_sold total_houses_sold + 1
+      ]
+    ][
+      print "No affordable sellers found"
+    ]
+
+  ] [
+    print "No affordable sellers found"
+  ]
+end
+
+
+
+to-report eip_checker [count_chinese count_indian count_malay count_others]
+  let results []
+  let total count_chinese + count_indian + count_malay + count_others
+
+  if count_chinese / total < eip_chinese[
+    set results lput "Chinese" results
+  ]
+
+  if count_indian / total < eip_indian[
+    set results lput "Indian" results
+  ]
+
+  if count_malay / total < eip_malay[
+    set results lput "Malay" results
+  ]
+
+  if count_others / total < eip_others[
+    set results lput "Others" results
+  ]
+
+  report results
+end
+
+
+
 
 ;; Check if seller willing to sell again
 to seller-selling-again
@@ -878,7 +1103,7 @@ eip_chinese
 eip_chinese
 0
 1
-0.84
+0.87
 0.1
 1
 NIL
@@ -893,7 +1118,7 @@ eip_indian
 eip_indian
 0
 1
-0.1
+0.12
 0.1
 1
 NIL
@@ -908,7 +1133,7 @@ eip_malay
 eip_malay
 0
 1
-0.22
+0.25
 0.1
 1
 NIL
@@ -923,7 +1148,7 @@ eip_others
 eip_others
 0
 1
-0.05
+0.15
 0.1
 1
 NIL
@@ -948,21 +1173,6 @@ Ethinic Integration Policy
 14
 0.0
 1
-
-SLIDER
-17
-462
-175
-495
-buyer_mean_income
-buyer_mean_income
-0
-100000
-21000.0
-1000
-1
-NIL
-HORIZONTAL
 
 TEXTBOX
 19
@@ -999,15 +1209,15 @@ SWITCH
 334
 ethnic-integration_policy?
 ethnic-integration_policy?
-1
+0
 1
 -1000
 
 SLIDER
-18
-513
-176
-546
+16
+464
+174
+497
 inflation
 inflation
 0
