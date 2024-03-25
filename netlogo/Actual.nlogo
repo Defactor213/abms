@@ -46,6 +46,99 @@ to setup
   reset-ticks
 end
 
+to paint-hdb
+  if mouse-down?[
+    ask patch mouse-xcor mouse-ycor [
+      ifelse not any? sellers-here[
+        if pcolor = red [
+          if paint-hdb-as = "selling"[
+            setup-sellers_paint number_of_hdb_units paint-hdb-as
+          ]
+          if paint-hdb-as = "not-selling"[
+            setup-sellers_paint number_of_hdb_units paint-hdb-as
+          ]
+        ]
+      ][
+        if paint-hdb-as = "remove"[
+         ask sellers-here [die]
+        ]
+      ]
+      display
+    ]
+  ]
+end
+
+; Setup the sellers
+to setup-sellers_paint [num-sellers selling_variable]
+  ;--------TO CHANGE
+
+  ; Initial counts for each race
+  let count-chinese 0
+  let count-indian 0
+  let count-malay 0
+  let count-others 0
+
+  ; Maximum allowed sellers for each race based on percentages
+  ;-----------TO CHANGE
+  let max-chinese eip_chinese * num-sellers
+  let max-indian eip_indian * num-sellers
+  let max-malay eip_malay * num-sellers
+  let max-others eip_others * num-sellers
+
+  ; Create sellers and assign their properties
+  sprout-sellers num-sellers[
+    set shape "house"
+
+    ; Randomly assign the lease year to the blocks
+    set lease_years random 50 + 50
+
+    ; Determine the seller's race
+    let my-race pick-race count-chinese max-chinese count-indian max-indian count-malay max-malay count-others max-others
+    set race my-race
+
+    ; Update race counts
+    if my-race = "Chinese" [ set count-chinese count-chinese + 1 ]
+    if my-race = "Indian" [ set count-indian count-indian + 1 ]
+    if my-race = "Malay" [ set count-malay count-malay + 1 ]
+    if my-race = "Others" [ set count-others count-others + 1 ]
+
+    ; Initialize other seller variables
+
+    ; -----------TO CHANGE
+    let my-family-size pick-household-size  ; random fammily size between 1-6
+    set family_size my-family-size
+    ;; 2,3,4,5,
+    ifelse (my-family-size <= 2) [
+      set room_type "2-room"
+    ] [
+      ifelse (my-family-size <= 3) [
+        set room_type "3-room"
+      ] [
+        ifelse (my-family-size <= 4) [
+          set room_type "4-room"
+        ] [
+          set room_type "5-room"
+        ]
+      ]
+    ]
+
+    ; ----- PLACEHOLDER for ask-price initialization
+    set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
+
+    ; ----- PLACEHOLDER for chances of selling
+    ifelse selling_variable = "selling"[
+      set selling? true
+      set color green
+    ][
+      set selling? false
+      set color yellow
+    ]
+
+
+  ]
+end
+
+
 ; Setup the Singapore Map and the HDB around Singapore
 to setup-hdb
   import-pcolors "singaporeMapBin.jpeg"
@@ -81,7 +174,7 @@ to setup-hdb
     ; Fine-tune this formula to reduce the overall density of HDB blocks
     let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * density_of_hdb_blocks)
     if random-float 1 < prob-hdb [
-      set pcolor green  ; Mark as HDB block
+      ;; set pcolor green  ; Mark as HDB block
       setup-sellers number_of_hdb_units
     ]
   ]
@@ -329,7 +422,6 @@ to go
   seller-selling-again
   avg_prices_by_race
   ;; update-mean-offer-price-histogram
-  update-total-houses-sold-histogram
 
   if ticks mod 1000 = 0 [
     ask buyers [
@@ -351,7 +443,6 @@ to decrease_lease_year
 end
 
 to buyer-initiate-meeting
-  print("buyer-initiate-meeting")
   ; Get all eligible sellers (if selling? is true)
   let eligible-sellers sellers with [selling? = true]
   ; If there are any eligible sellers
@@ -368,8 +459,6 @@ to buyer-initiate-meeting
         print (word "After grant: " buyer_price)
       ]
       ; Check if the sellers' ask price <= buyer's offer price
-      print(word "same_room_type" same_room_type)
-
       let max_ask_price max [ask-price] of eligible-sellers
       let lowest_ask_price max_ask_price
       let lowest_ask_seller nobody
@@ -380,42 +469,40 @@ to buyer-initiate-meeting
         let my-list sort (turtle-set other_sellers)
 
           ; Initialize counters for each ethnicity
-          let count_chinese 0
-          let count_indian 0
-          let count_malay 0
-          let count_others 0
-          ; Loop through each other seller
-          foreach my-list [other_seller ->
-            ; Check the ethnicity of the other_seller and update the corresponding counter
-            if [race] of other_seller = "Chinese" [
-              set count_chinese count_chinese + 1
-            ]
-            if [race] of other_seller = "Indian" [
-              set count_indian count_indian + 1
-            ]
-            if [race] of other_seller = "Malay" [
-              set count_malay count_malay + 1
-            ]
-            if [race] of other_seller = "Others" [
-              set count_others count_others + 1
-            ]
+        let count_chinese 0
+        let count_indian 0
+        let count_malay 0
+        let count_others 0
+        ; Loop through each other seller
+        foreach my-list [other_seller ->
+          ; Check the ethnicity of the other_seller and update the corresponding counter
+          if [race] of other_seller = "Chinese" [
+            set count_chinese count_chinese + 1
           ]
+          if [race] of other_seller = "Indian" [
+            set count_indian count_indian + 1
+          ]
+          if [race] of other_seller = "Malay" [
+            set count_malay count_malay + 1
+          ]
+          if [race] of other_seller = "Others" [
+            set count_others count_others + 1
+          ]
+        ]
 
-          ;; from the list of sellers check what races they are able to sell to
-          let races_to_sell_to eip_checker count_chinese count_indian count_malay count_others
+        ;; from the list of sellers check what races they are able to sell to
+        let races_to_sell_to eip_checker count_chinese count_indian count_malay count_others
 
-          ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
+        ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
         if member? [race] of self races_to_sell_to and ask-price <= lowest_ask_price [
           set lowest_ask_price ask-price
           set lowest_ask_seller self
         ]
 
-        ]
+      ]
 
-      print(word"sold to" lowest_ask_seller)
-
-      if lowest_ask_seller != nobody[
-          ask lowest_ask_seller [
+      ifelse lowest_ask_seller != nobody[
+        ask lowest_ask_seller [
           set color yellow   ; Change color of the seller to yellow
           set selling? false  ; Set the selling? variable of the seller to false
           set race [race] of self ; Change the race of the seller to the buyers race (since they have alr sold it)
@@ -440,13 +527,15 @@ to buyer-initiate-meeting
             ]
           ]
         ]
+      ][
+        print "Seller ask price is too high"
       ]
 
       ] [
-        print "No affordable sellers found"
+        print "No sellers with the same room type"
       ]
     ] [
-      print "No sellers with the same room type"
+      print "No eligible sellers found"
     ]
 end
 
@@ -676,7 +765,7 @@ end
 
 ;; Check if seller willing to sell again
 to seller-selling-again
-  ask sellers with [selling? = true] [
+  ask sellers with [selling? = false] [
     ask one-of sellers-here [
       ; -----------TO CHANGE
       let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of being a first-time buyer
@@ -808,19 +897,6 @@ to-report enhanced_housing_grant [fam_income]
   ]
 end
 
-to update-total-houses-sold-histogram
-  ; Clear existing histogram
-  set-current-plot "Houses Sold by Ethnicity"
-  set-current-plot-pen "sold_ethnicity"
-  let houses_sold []
-  set houses_sold lput total_houses_sold_chinese houses_sold
-  set houses_sold lput total_houses_sold_indian houses_sold
-  set houses_sold lput total_houses_sold_malay houses_sold
-  set houses_sold lput total_houses_sold_others houses_sold
-
-  ; Create histogram
-  histogram houses_sold
-end
 
 ; Additional functions to simulate buyer and seller interactions, transactions,
 ; and the effects of government policies will be needed here.
@@ -1152,7 +1228,7 @@ family_grant_income_level
 family_grant_income_level
 0
 30000
-21000.0
+30000.0
 1000
 1
 NIL
@@ -1167,7 +1243,7 @@ eip_chinese
 eip_chinese
 0
 1
-0.87
+0.6
 0.1
 1
 NIL
@@ -1197,7 +1273,7 @@ eip_malay
 eip_malay
 0
 1
-0.25
+0.2
 0.1
 1
 NIL
@@ -1212,7 +1288,7 @@ eip_others
 eip_others
 0
 1
-1.0
+0.1
 0.1
 1
 NIL
@@ -1298,7 +1374,7 @@ prob_seller_selling
 prob_seller_selling
 0
 1
-0.1
+0.3
 0.05
 1
 NIL
@@ -1353,7 +1429,7 @@ density_of_hdb_blocks
 density_of_hdb_blocks
 0
 1
-0.5
+1.0
 0.05
 1
 NIL
@@ -1367,6 +1443,33 @@ TEXTBOX
 the higher the density the lower the number of hdb blocks
 10
 0.0
+1
+
+CHOOSER
+27
+419
+165
+464
+paint-hdb-as
+paint-hdb-as
+"selling" "not-selling" "remove"
+0
+
+BUTTON
+29
+473
+110
+506
+NIL
+paint-hdb
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@
