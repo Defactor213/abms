@@ -771,7 +771,7 @@ to seller-selling-again
       let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of being a first-time buyer
 
       ;; If seller is willing to sell again
-      if selling?[
+      if selling_var?[
         set color green ; Change the patch color back to green
         set selling? selling_var? ; Change the variable back to true
 
@@ -1359,7 +1359,7 @@ number_of_buyers
 number_of_buyers
 0
 100
-50.0
+13.0
 1
 1
 NIL
