@@ -79,10 +79,10 @@ to setup-hdb
   ask patches with [pcolor = red] [
     let distance-from-center distancexy center-x center-y
     ; Fine-tune this formula to reduce the overall density of HDB blocks
-    let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * 0.5)
+    let prob-hdb (0.3 - (distance-from-center / (world-width / 2)) * density_of_hdb_blocks)
     if random-float 1 < prob-hdb [
       set pcolor green  ; Mark as HDB block
-      setup-sellers 60
+      setup-sellers number_of_hdb_units
     ]
   ]
 
@@ -230,8 +230,7 @@ to setup-buyers [num_to_create]
 
 
     ; PLACEHOLDER Determine if its firsttimer or not
-    let first-timer? random-float 1.0 < 0.5  ; 50% chance of being a first-time buyer
-    let first-timer ifelse-value (first-timer?) [true] [false]
+    let first-timer? random-float 1.0 < prob_of_first_timer
 
     ; -----------TO CHANGE
     let my-family-size pick-household-size; random fammily size between 1-6
@@ -834,10 +833,10 @@ end
 ; more detailed interactions based on the project proposal.
 @#$#@#$#@
 GRAPHICS-WINDOW
-271
-12
-880
-472
+275
+94
+884
+554
 -1
 -1
 2.993
@@ -878,10 +877,10 @@ NIL
 1
 
 MONITOR
-913
-141
-1046
-186
+1262
+49
+1395
+94
 Number of Sellers Selling
 count turtles with [color = green]
 17
@@ -906,10 +905,10 @@ NIL
 1
 
 MONITOR
-913
-52
-1019
-97
+1032
+50
+1138
+95
 Number of Buyers
 count turtles with [color = sky or color = violet or color = pink or color = orange]
 17
@@ -934,10 +933,10 @@ NIL
 1
 
 PLOT
-1231
-15
-1678
-194
+1029
+103
+1560
+282
 Number of Buyers, Sellers (selling and not selling)
 NIL
 NIL
@@ -954,10 +953,10 @@ PENS
 "Seller" 1.0 0 -11085214 true "" "plot count turtles with [color = green]"
 
 MONITOR
-1028
-52
-1126
-97
+1147
+50
+1245
+95
 Number of Seller
 count turtles with [color = green or color = yellow]
 17
@@ -965,10 +964,10 @@ count turtles with [color = green or color = yellow]
 11
 
 MONITOR
-1063
-140
-1211
-185
+1412
+48
+1560
+93
 Number of sellers not selling
 count turtles with [color = yellow]
 17
@@ -976,30 +975,30 @@ count turtles with [color = yellow]
 11
 
 TEXTBOX
-910
-19
-1130
-53
+1032
+20
+1252
+54
 Number of agents in the model
 14
 0.0
 1
 
 TEXTBOX
-915
-106
-1133
-140
+1263
+19
+1481
+53
 Number of sellers in the model
 14
 0.0
 1
 
 PLOT
-1233
-223
-1682
-403
+1031
+377
+1480
+557
 Number of Houses 
 NIL
 NIL
@@ -1016,10 +1015,10 @@ PENS
 "Houses Not Sold" 1.0 0 -2674135 true "" "plot houses_not_sold"
 
 MONITOR
-917
-314
-1052
-359
+1255
+322
+1390
+367
 Total number of houses
 count turtles with [color = green]
 17
@@ -1027,10 +1026,10 @@ count turtles with [color = green]
 11
 
 MONITOR
-1027
-260
-1128
-305
+1142
+322
+1243
+367
 Total houses sold
 total_houses_sold
 17
@@ -1038,10 +1037,10 @@ total_houses_sold
 11
 
 MONITOR
-917
-258
-1012
-303
+1032
+320
+1127
+365
 Houses not sold
 houses_not_sold
 17
@@ -1049,30 +1048,30 @@ houses_not_sold
 11
 
 TEXTBOX
-917
-230
-1155
-264
+1032
+292
+1270
+326
 Number of houses in the model
 14
 0.0
 1
 
 TEXTBOX
-919
-414
-1102
-448
+1040
+569
+1223
+603
 Houses Sold by ethinicity 
 14
 0.0
 1
 
 MONITOR
-916
-447
-1008
-492
+1037
+602
+1129
+647
 Sold to Chinese
 total_houses_sold_chinese
 17
@@ -1080,10 +1079,10 @@ total_houses_sold_chinese
 11
 
 MONITOR
-1019
-447
-1118
-492
+1140
+602
+1239
+647
 Sold to Indians
 total_houses_sold_indian
 17
@@ -1091,10 +1090,10 @@ total_houses_sold_indian
 11
 
 MONITOR
-917
-505
-999
-550
+1249
+602
+1331
+647
 Sold to Malay
 total_houses_sold_malay
 17
@@ -1102,10 +1101,10 @@ total_houses_sold_malay
 11
 
 MONITOR
-1019
-503
-1103
-548
+1344
+602
+1428
+647
 Sold to others
 total_houses_sold_others
 17
@@ -1113,10 +1112,10 @@ total_houses_sold_others
 11
 
 PLOT
-1235
-422
-1668
-602
+1036
+659
+1469
+839
 Average Price of houses by ethnicity 
 NIL
 NIL
@@ -1134,10 +1133,10 @@ PENS
 "Others" 1.0 0 -955883 true "" "plot total_houses_sold_others_average"
 
 SWITCH
-19
-178
-175
-211
+23
+99
+179
+132
 government_policy?
 government_policy?
 0
@@ -1145,25 +1144,25 @@ government_policy?
 -1000
 
 SLIDER
-18
-220
-205
-253
+22
+143
+209
+176
 family_grant_income_level
 family_grant_income_level
 0
 30000
-30000.0
+21000.0
 1000
 1
 NIL
 HORIZONTAL
 
 SLIDER
-20
-335
-134
-368
+27
+253
+141
+286
 eip_chinese
 eip_chinese
 0
@@ -1175,10 +1174,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-140
-336
-256
-369
+147
+254
+263
+287
 eip_indian
 eip_indian
 0
@@ -1190,10 +1189,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-20
-378
-134
-411
+26
+293
+140
+326
 eip_malay
 eip_malay
 0
@@ -1205,10 +1204,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-140
-379
-256
-412
+146
+294
+262
+327
 eip_others
 eip_others
 0
@@ -1220,58 +1219,40 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-19
-154
-169
+22
+75
 172
+93
 Government Variables
 14
 0.0
 1
 
 TEXTBOX
-23
-267
-215
-301
+25
+188
+217
+222
 Ethinic Integration Policy
 14
 0.0
 1
 
 TEXTBOX
-24
-425
-174
-443
+29
+335
+179
+353
 Affodability
 14
 0.0
 1
 
-PLOT
-694
-490
-894
-640
-Houses Sold by Ethnicity
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"sold_ethnicity" 1.0 1 -16777216 true "" ""
-
 SWITCH
-20
-292
-207
-325
+27
+213
+214
+246
 ethnic-integration_policy?
 ethnic-integration_policy?
 0
@@ -1279,10 +1260,10 @@ ethnic-integration_policy?
 -1000
 
 SLIDER
-20
-450
-178
-483
+27
+360
+185
+393
 inflation
 inflation
 0
@@ -1294,10 +1275,10 @@ inflation
 HORIZONTAL
 
 SLIDER
-18
-107
-190
-140
+646
+20
+818
+53
 number_of_buyers
 number_of_buyers
 0
@@ -1309,10 +1290,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-18
-63
-190
-96
+1015
+19
+1187
+52
 prob_seller_selling
 prob_seller_selling
 0
@@ -1324,12 +1305,67 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-278
-476
-428
-551
+894
+100
+1001
+175
 Legend:\nChinese: Sky\nIndian: Pink\nMalay: Violet\nOthers: Orange\n
 12
+0.0
+1
+
+SLIDER
+465
+19
+637
+52
+number_of_hdb_units
+number_of_hdb_units
+10
+100
+60.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+831
+19
+1003
+52
+prob_of_first_timer
+prob_of_first_timer
+0
+1
+0.5
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+284
+18
+456
+51
+density_of_hdb_blocks
+density_of_hdb_blocks
+0
+1
+0.5
+0.05
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+287
+55
+437
+81
+the higher the density the lower the number of hdb blocks
+10
 0.0
 1
 
