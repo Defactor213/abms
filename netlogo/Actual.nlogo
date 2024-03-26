@@ -71,7 +71,7 @@ to paint-hdb
 end
 
 to setup-house-price
-  set mean_house_price 44000
+  set mean_house_price 427506.984
 end
 
 ; Setup the sellers
@@ -130,7 +130,7 @@ to setup-sellers_paint [num-sellers selling_variable]
 
     ; ----- PLACEHOLDER for ask-price initialization
     ; set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
-    set ask-price exp((0.946772 * ln(mean_house_price) + 0.008878 * lease_years) - 0.014472321274512367)
+    set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
 
     ; ----- PLACEHOLDER for chances of selling
     ifelse selling_variable = "selling"[
@@ -190,7 +190,7 @@ end
 
 to-report pick-neighborhood-score
   let scores [1 2 3 4 5 6 7 8 9 10]
-  let weights [0.01429809 0.07397792 0.10684776 0.12311818 0.12733103 0.12311818 0.10684776 0.07397792 0.01429809 0.00926308]
+  let weights [0.0142 0.0739 0.106 0.123 0.127 0.123 0.106 0.0739 0.0142 0.00926]
   ; Combine the items and weights into pairs
   let pairs (map [ [i w] -> (list i w) ] scores weights)
 
@@ -272,7 +272,7 @@ to setup-sellers [num-sellers]
 
     ; ----- PLACEHOLDER for ask-price initialization
     ;set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
-    set ask-price exp((0.946772 * ln(mean_house_price) + 0.008878 * lease_years) - 0.014472321274512367)
+    set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
 
     ; ----- PLACEHOLDER for chances of selling
     let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of selling the house
@@ -391,7 +391,7 @@ to setup-buyers [num_to_create]
         ; -----------TO CHANGE
     ; Determine the offer price of the buyer
     ; let my-offer-price random 980000 + 20000
-    let my-offer-price exp((0.902600 * ln(mean_house_price)) + (0.013297 * neighborhood_score) + (0.235408 * family_size) + (0.006035 * remaining-lease) - 0.26345270437825263)
+    let my-offer-price exp((0.902 * ln(mean_house_price)) + (0.0132 * neighborhood_score) + (0.235 * family_size) + (0.00603 * remaining-lease) - 0.263)
 
 
 
@@ -448,7 +448,7 @@ to go
   avg_prices_by_race
   ;; update-mean-offer-price-histogram
 
-  if ticks mod 1000 = 0 [
+  if ticks mod 12 = 0 [
     ask buyers [
       set income (income * (1 + inflation))
     ]
