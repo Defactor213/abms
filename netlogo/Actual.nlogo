@@ -14,11 +14,11 @@ globals[
   total_houses_sold_others
   total_houses_sold_others_price
   total_houses_sold_others_average
+  mean_house_price
 ]
 breed [sellers seller]
 breed [buyers buyer]
 
-;---------@ERIC add what u need--------
 sellers-own[
   seller-id
   race
@@ -27,6 +27,7 @@ sellers-own[
   room_type
   family_size
   lease_years
+  neighborhood_score
 ]
 
 buyers-own[
@@ -36,11 +37,12 @@ buyers-own[
   offer_price
   room_type
   family_size
+  neighborhood_score
 ]
 
 to setup
-
   clear-all
+  setup-house-price
   setup-hdb
   setup-buyers 100
   reset-ticks
@@ -66,6 +68,10 @@ to paint-hdb
       display
     ]
   ]
+end
+
+to setup-house-price
+  set mean_house_price 44000
 end
 
 ; Setup the sellers
@@ -123,7 +129,8 @@ to setup-sellers_paint [num-sellers selling_variable]
     ]
 
     ; ----- PLACEHOLDER for ask-price initialization
-    set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
+    ; set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
+    set ask-price exp((0.946772 * ln(mean_house_price) + 0.008878 * lease_years) - 0.014472321274512367)
 
     ; ----- PLACEHOLDER for chances of selling
     ifelse selling_variable = "selling"[
@@ -179,6 +186,19 @@ to setup-hdb
     ]
   ]
 
+end
+
+to-report pick-neighborhood-score
+  let scores [1 2 3 4 5 6 7 8 9 10]
+  let weights [0.01429809 0.07397792 0.10684776 0.12311818 0.12733103 0.12311818 0.10684776 0.07397792 0.01429809 0.00926308]
+  ; Combine the items and weights into pairs
+  let pairs (map [ [i w] -> (list i w) ] scores weights)
+
+  ; Use rnd:weighted-one-of-list to pick an item based on weights
+  let chosen-pair rnd:weighted-one-of-list pairs [ [p] -> last p ]
+
+  ; Report the first item of the chosen pair, which is the household size
+  report first chosen-pair
 end
 
 to-report pick-household-size
@@ -251,7 +271,8 @@ to setup-sellers [num-sellers]
     ]
 
     ; ----- PLACEHOLDER for ask-price initialization
-    set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
+    ;set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
+    set ask-price exp((0.946772 * ln(mean_house_price) + 0.008878 * lease_years) - 0.014472321274512367)
 
     ; ----- PLACEHOLDER for chances of selling
     let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of selling the house
@@ -327,7 +348,9 @@ to setup-buyers [num_to_create]
 
     ; -----------TO CHANGE
     let my-family-size pick-household-size; random fammily size between 1-6
+    let my-neighborhood-score pick-neighborhood-score
     set family_size my-family-size
+    set neighborhood_score my-neighborhood-score
     ;; 2,3,4,5,
     ifelse (my-family-size <= 2) [
       set room_type "2-room"
@@ -364,10 +387,12 @@ to setup-buyers [num_to_create]
         ]
       ]
     ]
-
+    let remaining-lease random 100
         ; -----------TO CHANGE
     ; Determine the offer price of the buyer
-    let my-offer-price random 980000 + 20000
+    ; let my-offer-price random 980000 + 20000
+    let my-offer-price exp((0.902600 * ln(mean_house_price)) + (0.013297 * neighborhood_score) + (0.235408 * family_size) + (0.006035 * remaining-lease) - 0.26345270437825263)
+
 
 
     ; Assigning initialized attributes to each buyer
@@ -427,6 +452,7 @@ to go
     ask buyers [
       set income (income * (1 + inflation))
     ]
+    set mean_house_price (mean_house_price * (1 + mean_house_price))
   ]
 
   setup-buyers number_of_buyers
