@@ -2,6 +2,8 @@ extensions [rnd]
 
 globals[
   total_houses_sold
+  total_houses_sold_price
+  total_houses_sold_average
   total_houses_sold_chinese
   total_houses_sold_chinese_price
   total_houses_sold_chinese_average
@@ -72,6 +74,7 @@ to paint-hdb
 end
 
 to setup-house-price
+  ;; starting mean price from jan 2017
   set mean_house_price 427506.984
 end
 
@@ -445,7 +448,7 @@ to go
   avg_prices_by_race
   ;; update-mean-offer-price-histogram
 
-  if ticks mod 12 = 0 [
+  if ticks mod 2 = 0 [
     ask buyers [
       set income (income * (1 + income_growth))
     ]
@@ -457,7 +460,7 @@ end
 
 to decrease_lease_year
   ask sellers [
-    set lease_years lease_years - 1
+    set lease_years lease_years - 6
     if lease_years = 0 [
       set lease_years 99
     ]
@@ -1041,7 +1044,7 @@ PLOT
 182
 1437
 361
-Number of Buyers, Sellers (selling and not selling)
+Number of Buyers, Sellers
 NIL
 NIL
 0.0
@@ -1113,7 +1116,6 @@ true
 true
 "" ""
 PENS
-"Total Houses " 1.0 0 -14070903 true "" "plot count turtles with [color = green]"
 "Houses Sold" 1.0 0 -11085214 true "" "plot total_houses_sold"
 "Houses Not Sold" 1.0 0 -2674135 true "" "plot houses_not_sold"
 
@@ -1123,7 +1125,7 @@ MONITOR
 1525
 449
 Total number of houses
-count turtles with [color = green]
+count turtles with [shape = \"house\"]
 17
 1
 11
@@ -1502,6 +1504,42 @@ Number of houses in the model
 14
 0.0
 1
+
+PLOT
+1322
+660
+1694
+899
+Average Price of Houses
+Time
+Price
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot total_houses_sold_average"
+
+PLOT
+911
+660
+1300
+899
+Number of Transactions
+time
+Transactions
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
 
 @#$#@#$#@
 ## WHAT IS IT?
