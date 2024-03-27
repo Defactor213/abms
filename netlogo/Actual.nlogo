@@ -491,7 +491,7 @@ to buyer-initiate-meeting
         let other_sellers other turtles-on patch-here
         let my-list sort (turtle-set other_sellers)
 
-          ; Initialize counters for each ethnicity
+        ; Initialize counters for each ethnicity
         let count_chinese 0
         let count_indian 0
         let count_malay 0
@@ -550,21 +550,22 @@ to buyer-initiate-meeting
             ]
           ]
         ]
+        ; Now, let the buyer die
+        die
       ][
         print "Seller ask price is too high"
       ]
 
-      ] [
-        print "No sellers with the same room type"
-      ]
     ] [
-      print "No eligible sellers found"
+      print "No sellers with the same room type"
     ]
+  ] [
+    print "No eligible sellers found"
+  ]
 end
 
 
 to buyer-initiate-meeting_no_government
-  print("buyer-initiate-meeting_no_government")
   ; Get all eligible sellers (if selling? is true)
   let eligible-sellers sellers with [selling? = true]
   ; If there are any eligible sellers
@@ -575,8 +576,6 @@ to buyer-initiate-meeting_no_government
     ifelse any? same_room_type [
       let buyer_price offer_price
       ; Check if the sellers' ask price <= buyer's offer price
-      print(word "same_room_type" same_room_type)
-
       let max_ask_price max [ask-price] of eligible-sellers
       let lowest_ask_price max_ask_price
       let lowest_ask_seller nobody
@@ -586,43 +585,41 @@ to buyer-initiate-meeting_no_government
         let other_sellers other turtles-on patch-here
         let my-list sort (turtle-set other_sellers)
 
-          ; Initialize counters for each ethnicity
-          let count_chinese 0
-          let count_indian 0
-          let count_malay 0
-          let count_others 0
-          ; Loop through each other seller
-          foreach my-list [other_seller ->
-            ; Check the ethnicity of the other_seller and update the corresponding counter
-            if [race] of other_seller = "Chinese" [
-              set count_chinese count_chinese + 1
-            ]
-            if [race] of other_seller = "Indian" [
-              set count_indian count_indian + 1
-            ]
-            if [race] of other_seller = "Malay" [
-              set count_malay count_malay + 1
-            ]
-            if [race] of other_seller = "Others" [
-              set count_others count_others + 1
-            ]
+        ; Initialize counters for each ethnicity
+        let count_chinese 0
+        let count_indian 0
+        let count_malay 0
+        let count_others 0
+        ; Loop through each other seller
+        foreach my-list [other_seller ->
+          ; Check the ethnicity of the other_seller and update the corresponding counter
+          if [race] of other_seller = "Chinese" [
+            set count_chinese count_chinese + 1
           ]
+          if [race] of other_seller = "Indian" [
+            set count_indian count_indian + 1
+          ]
+          if [race] of other_seller = "Malay" [
+            set count_malay count_malay + 1
+          ]
+          if [race] of other_seller = "Others" [
+            set count_others count_others + 1
+          ]
+        ]
 
-          ;; from the list of sellers check what races they are able to sell to
-          let races_to_sell_to eip_checker count_chinese count_indian count_malay count_others
+        ;; from the list of sellers check what races they are able to sell to
+        let races_to_sell_to eip_checker count_chinese count_indian count_malay count_others
 
-          ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
+        ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
         if member? [race] of self races_to_sell_to and ask-price <= lowest_ask_price [
           set lowest_ask_price ask-price
           set lowest_ask_seller self
         ]
 
-        ]
+      ]
 
-      print(word"sold to" lowest_ask_seller)
-
-      if lowest_ask_seller != nobody[
-          ask lowest_ask_seller [
+      ifelse lowest_ask_seller != nobody[
+        ask lowest_ask_seller [
           set color yellow   ; Change color of the seller to yellow
           set selling? false  ; Set the selling? variable of the seller to false
           set race [race] of self ; Change the race of the seller to the buyers race (since they have alr sold it)
@@ -647,18 +644,20 @@ to buyer-initiate-meeting_no_government
             ]
           ]
         ]
+        ; Now, let the buyer die
+        die
+      ][
+        print "Seller ask price is too high"
       ]
 
-      ] [
-        print "No affordable sellers found"
-      ]
     ] [
       print "No sellers with the same room type"
     ]
+  ] [
+    print "No eligible sellers found"
+  ]
 end
-
 to buyer-initiate-meeting_no_eip
-  print("buyer-initiate-meeting_no_eip")
   ; Get all eligible sellers (if selling? is true)
   let eligible-sellers sellers with [selling? = true]
   ; If there are any eligible sellers
@@ -675,14 +674,12 @@ to buyer-initiate-meeting_no_eip
         print (word "After grant: " buyer_price)
       ]
       ; Check if the sellers' ask price <= buyer's offer price
-      print(word "same_room_type" same_room_type)
-
       let max_ask_price max [ask-price] of eligible-sellers
       let lowest_ask_price max_ask_price
       let lowest_ask_seller nobody
 
       ask same_room_type with [ask-price <= buyer_price][
-        ;; check if the ask_price is lower than the previous agent
+        ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
         if ask-price <= lowest_ask_price [
           set lowest_ask_price ask-price
           set lowest_ask_seller self
@@ -690,9 +687,7 @@ to buyer-initiate-meeting_no_eip
 
       ]
 
-      print(word"sold to" lowest_ask_seller)
-
-      if lowest_ask_seller != nobody[
+      ifelse lowest_ask_seller != nobody[
         ask lowest_ask_seller [
           set color yellow   ; Change color of the seller to yellow
           set selling? false  ; Set the selling? variable of the seller to false
@@ -700,18 +695,22 @@ to buyer-initiate-meeting_no_eip
 
         ]
         set total_houses_sold total_houses_sold + 1
-      ]
-    ][
-      print "No affordable sellers found"
-    ]
 
+        ; Now, let the buyer die
+        die
+      ][
+        print "Seller ask price is too high"
+      ]
+
+    ] [
+      print "No sellers with the same room type"
+    ]
   ] [
-    print "No affordable sellers found"
+    print "No eligible sellers found"
   ]
 end
 
 to buyer-initiate-meeting_no_eip_no_governemnt
-  print("buyer-initiate-meeting_no_eip_no_governemnt")
   ; Get all eligible sellers (if selling? is true)
   let eligible-sellers sellers with [selling? = true]
   ; If there are any eligible sellers
@@ -721,16 +720,13 @@ to buyer-initiate-meeting_no_eip_no_governemnt
     ; Calculate the grant that the buyers would get (their new offer price)
     ifelse any? same_room_type [
       let buyer_price offer_price
-
       ; Check if the sellers' ask price <= buyer's offer price
-      print(word "same_room_type" same_room_type)
-
       let max_ask_price max [ask-price] of eligible-sellers
       let lowest_ask_price max_ask_price
       let lowest_ask_seller nobody
 
       ask same_room_type with [ask-price <= buyer_price][
-        ;; check if the ask_price is lower than the previous agent
+        ;; check if the current seller has the same race as the races_to_sell_to list and if the ask_price is lower than the previous agent
         if ask-price <= lowest_ask_price [
           set lowest_ask_price ask-price
           set lowest_ask_seller self
@@ -738,9 +734,7 @@ to buyer-initiate-meeting_no_eip_no_governemnt
 
       ]
 
-      print(word"sold to" lowest_ask_seller)
-
-      if lowest_ask_seller != nobody[
+      ifelse lowest_ask_seller != nobody[
         ask lowest_ask_seller [
           set color yellow   ; Change color of the seller to yellow
           set selling? false  ; Set the selling? variable of the seller to false
@@ -748,13 +742,18 @@ to buyer-initiate-meeting_no_eip_no_governemnt
 
         ]
         set total_houses_sold total_houses_sold + 1
-      ]
-    ][
-      print "No affordable sellers found"
-    ]
 
+        ; Now, let the buyer die
+        die
+      ][
+        print "Seller ask price is too high"
+      ]
+
+    ] [
+      print "No sellers with the same room type"
+    ]
   ] [
-    print "No affordable sellers found"
+    print "No eligible sellers found"
   ]
 end
 
@@ -1122,7 +1121,7 @@ MONITOR
 1370
 404
 1525
-450
+449
 Total number of houses
 count turtles with [color = green]
 17
@@ -1133,7 +1132,7 @@ MONITOR
 1535
 404
 1689
-451
+449
 Total houses sold
 total_houses_sold
 17
@@ -1366,7 +1365,7 @@ number_of_buyers
 number_of_buyers
 0
 100
-100.0
+88.0
 1
 1
 NIL
