@@ -42,6 +42,7 @@ buyers-own[
 
 to setup
   clear-all
+  clear-output
   setup-house-price
   setup-hdb
   setup-buyers 100
@@ -275,7 +276,7 @@ to setup-sellers [num-sellers]
     set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
 
     ; ----- PLACEHOLDER for chances of selling
-    let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of selling the house
+    let selling_var? random-float 1.0 < prob_seller_selling
 
     set selling? selling_var?
 
@@ -387,7 +388,7 @@ to setup-buyers [num_to_create]
         ]
       ]
     ]
-    let remaining-lease random 100
+    let remaining-lease random 50 + 50
         ; -----------TO CHANGE
     ; Determine the offer price of the buyer
     ; let my-offer-price random 980000 + 20000
@@ -412,17 +413,13 @@ to setup-buyers [num_to_create]
   ]
 end
 
-
-
 ; The main simulation loop
 to go
-  set total_houses_sold 0
-  set total_houses_sold_chinese 0
-  set total_houses_sold_indian 0
-  set total_houses_sold_others 0
-  set total_houses_sold_malay 0
-
-  ; Placeholder for the main simulation steps, such as moving buyers, initiating transactions.
+  ;set total_houses_sold 0
+  ;set total_houses_sold_chinese 0
+  ;set total_houses_sold_indian 0
+  ;set total_houses_sold_others 0
+  ;set total_houses_sold_malay 0
 
   ask buyers [
     ifelse government_policy? and ethnic-integration_policy?[
@@ -450,9 +447,9 @@ to go
 
   if ticks mod 12 = 0 [
     ask buyers [
-      set income (income * (1 + inflation))
+      set income (income * (1 + income_growth))
     ]
-    set mean_house_price (mean_house_price * (1 + mean_house_price))
+    set mean_house_price (mean_house_price * (1 + inflation))
   ]
 
   setup-buyers number_of_buyers
@@ -481,7 +478,7 @@ to buyer-initiate-meeting
       if first_time? [
         let fam_grant family_grant_discount room_type income
         let ehg enhanced_housing_grant income
-        set buyer_price offer_price - fam_grant - ehg
+        set buyer_price offer_price + fam_grant + ehg
         print (word "After grant: " buyer_price)
       ]
       ; Check if the sellers' ask price <= buyer's offer price
@@ -674,7 +671,7 @@ to buyer-initiate-meeting_no_eip
       if first_time? [
         let fam_grant family_grant_discount room_type income
         let ehg enhanced_housing_grant income
-        set buyer_price offer_price - fam_grant - ehg
+        set buyer_price offer_price + fam_grant + ehg
         print (word "After grant: " buyer_price)
       ]
       ; Check if the sellers' ask price <= buyer's offer price
@@ -793,17 +790,23 @@ end
 to seller-selling-again
   ask sellers with [selling? = false] [
     ask one-of sellers-here [
-      ; -----------TO CHANGE
-      let selling_var? random-float 1.0 < prob_seller_selling  ; 50% chance of being a first-time buyer
+
+      let selling_var? random-float 1.0 < prob_seller_selling
 
       ;; If seller is willing to sell again
       if selling_var?[
         set color green ; Change the patch color back to green
         set selling? selling_var? ; Change the variable back to true
 
-        ; -----------TO CHANGE
-        set ask-price (random-float 100) + 100 ; set the ask price of the house
+
+        ;set ask-price (random-float 100) + 100 ; set the ask price of the house
+        set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
       ]
+    ]
+  ]
+  ask sellers with [selling? = true][
+    ask one-of sellers-here [
+      set selling? not selling?
     ]
   ]
 
@@ -1035,10 +1038,10 @@ NIL
 1
 
 PLOT
-905
-179
-1436
-358
+906
+182
+1437
+361
 Number of Buyers, Sellers (selling and not selling)
 NIL
 NIL
@@ -1050,16 +1053,15 @@ true
 true
 "" ""
 PENS
-"Buyer" 1.0 0 -13791810 true "" "plot count turtles with [color = blue]"
-"Seller not Selling" 1.0 0 -1184463 true "" "plot count turtles with [color = yellow]"
+"Buyer" 1.0 0 -13791810 true "" "plot count turtles with [shape = \"person\"]"
 "Seller" 1.0 0 -11085214 true "" "plot count turtles with [color = green]"
 
 MONITOR
 1023
 126
-1121
+1125
 171
-Number of Seller
+Number of Flats
 count turtles with [color = green or color = yellow]
 17
 1
@@ -1068,7 +1070,7 @@ count turtles with [color = green or color = yellow]
 MONITOR
 1287
 125
-1435
+1454
 170
 Number of sellers not selling
 count turtles with [color = yellow]
@@ -1099,7 +1101,7 @@ Number of sellers in the model
 PLOT
 1369
 459
-1818
+1689
 639
 Number of Houses 
 NIL
@@ -1117,10 +1119,10 @@ PENS
 "Houses Not Sold" 1.0 0 -2674135 true "" "plot houses_not_sold"
 
 MONITOR
-1594
+1370
 404
-1729
-449
+1525
+450
 Total number of houses
 count turtles with [color = green]
 17
@@ -1128,36 +1130,15 @@ count turtles with [color = green]
 11
 
 MONITOR
-1480
+1535
 404
-1581
-449
+1689
+451
 Total houses sold
 total_houses_sold
 17
 1
 11
-
-MONITOR
-1370
-402
-1465
-447
-Houses not sold
-houses_not_sold
-17
-1
-11
-
-TEXTBOX
-1370
-374
-1608
-408
-Number of houses in the model
-14
-0.0
-1
 
 TEXTBOX
 912
@@ -1385,7 +1366,7 @@ number_of_buyers
 number_of_buyers
 0
 100
-13.0
+100.0
 1
 1
 NIL
@@ -1394,23 +1375,23 @@ HORIZONTAL
 SLIDER
 1015
 19
-1187
+1175
 52
 prob_seller_selling
 prob_seller_selling
 0
-1
-0.3
-0.05
+0.1
+0.01
+0.01
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
 184
-469
+500
 291
-544
+575
 Legend:\nChinese: Sky\nIndian: Pink\nMalay: Violet\nOthers: Orange\n
 12
 0.0
@@ -1473,9 +1454,9 @@ the higher the density the lower the number of hdb blocks
 
 CHOOSER
 27
-419
+450
 165
-464
+495
 paint-hdb-as
 paint-hdb-as
 "selling" "not-selling" "remove"
@@ -1483,9 +1464,9 @@ paint-hdb-as
 
 BUTTON
 29
-473
+504
 110
-506
+537
 NIL
 paint-hdb
 T
@@ -1496,6 +1477,31 @@ NIL
 NIL
 NIL
 NIL
+1
+
+SLIDER
+28
+401
+186
+434
+income_growth
+income_growth
+0
+10
+2.0
+0.1
+1
+%
+HORIZONTAL
+
+TEXTBOX
+1370
+374
+1608
+408
+Number of houses in the model
+14
+0.0
 1
 
 @#$#@#$#@
