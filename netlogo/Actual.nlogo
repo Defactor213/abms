@@ -2,6 +2,7 @@ extensions [rnd]
 
 globals[
   total_houses_sold
+  total_houses_sold_per_tick
   total_houses_sold_price
   total_houses_sold_average
   total_houses_sold_chinese
@@ -132,11 +133,9 @@ to setup-sellers_paint [num-sellers selling_variable]
       ]
     ]
 
-    ; ----- PLACEHOLDER for ask-price initialization
     ; set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
     set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
 
-    ; ----- PLACEHOLDER for chances of selling
     ifelse selling_variable = "selling"[
       set selling? true
       set color green
@@ -176,7 +175,7 @@ to setup-hdb
     set center-x mean [pxcor] of red-patches
     set center-y mean [pycor] of red-patches
   ] [
-    print "No red patches found"
+  ;  print "No red patches found"
   ]
 
   ; Adjust HDB distribution according to Singapore map
@@ -274,11 +273,9 @@ to setup-sellers [num-sellers]
       ]
     ]
 
-    ; ----- PLACEHOLDER for ask-price initialization
     ;set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
     set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
 
-    ; ----- PLACEHOLDER for chances of selling
     let selling_var? random-float 1.0 < prob_seller_selling
 
     set selling? selling_var?
@@ -419,6 +416,7 @@ end
 ; The main simulation loop
 to go
   ;set total_houses_sold 0
+  set total_houses_sold_per_tick 0
   ;set total_houses_sold_chinese 0
   ;set total_houses_sold_indian 0
   ;set total_houses_sold_others 0
@@ -440,7 +438,6 @@ to go
         ]
       ]
     ]
-
   ]
   tick
   decrease_lease_year
@@ -456,6 +453,7 @@ to go
   ]
 
   setup-buyers number_of_buyers
+ ; print(total_houses_sold_per_tick)
 end
 
 to decrease_lease_year
@@ -482,7 +480,7 @@ to buyer-initiate-meeting
         let fam_grant family_grant_discount room_type income
         let ehg enhanced_housing_grant income
         set buyer_price offer_price + fam_grant + ehg
-        print (word "After grant: " buyer_price)
+        ;print (word "After grant: " buyer_price)
       ]
       ; Check if the sellers' ask price <= buyer's offer price
       let max_ask_price max [ask-price] of eligible-sellers
@@ -535,6 +533,7 @@ to buyer-initiate-meeting
 
         ]
         set total_houses_sold total_houses_sold + 1
+        set total_houses_sold_per_tick total_houses_sold_per_tick + 1
 
         ifelse race = "Chinese"[
           set total_houses_sold_chinese total_houses_sold_chinese + 1
@@ -554,16 +553,17 @@ to buyer-initiate-meeting
           ]
         ]
         ; Now, let the buyer die
+        set total_houses_sold_price total_houses_sold_price + offer_price
         die
       ][
-        print "Seller ask price is too high"
+        ;print "Seller ask price is too high"
       ]
 
     ] [
-      print "No sellers with the same room type"
+     ; print "No sellers with the same room type"
     ]
   ] [
-    print "No eligible sellers found"
+   ; print "No eligible sellers found"
   ]
 end
 
@@ -629,6 +629,7 @@ to buyer-initiate-meeting_no_government
 
         ]
         set total_houses_sold total_houses_sold + 1
+        set total_houses_sold_per_tick total_houses_sold_per_tick + 1
 
         ifelse race = "Chinese"[
           set total_houses_sold_chinese total_houses_sold_chinese + 1
@@ -647,19 +648,21 @@ to buyer-initiate-meeting_no_government
             ]
           ]
         ]
+        set total_houses_sold_price total_houses_sold_price + offer_price
         ; Now, let the buyer die
         die
       ][
-        print "Seller ask price is too high"
+       ; print "Seller ask price is too high"
       ]
 
     ] [
-      print "No sellers with the same room type"
+     ; print "No sellers with the same room type"
     ]
   ] [
-    print "No eligible sellers found"
+  ;  print "No eligible sellers found"
   ]
 end
+
 to buyer-initiate-meeting_no_eip
   ; Get all eligible sellers (if selling? is true)
   let eligible-sellers sellers with [selling? = true]
@@ -674,7 +677,7 @@ to buyer-initiate-meeting_no_eip
         let fam_grant family_grant_discount room_type income
         let ehg enhanced_housing_grant income
         set buyer_price offer_price + fam_grant + ehg
-        print (word "After grant: " buyer_price)
+      ;  print (word "After grant: " buyer_price)
       ]
       ; Check if the sellers' ask price <= buyer's offer price
       let max_ask_price max [ask-price] of eligible-sellers
@@ -698,18 +701,19 @@ to buyer-initiate-meeting_no_eip
 
         ]
         set total_houses_sold total_houses_sold + 1
-
+        set total_houses_sold_per_tick total_houses_sold_per_tick + 1
+        set total_houses_sold_price total_houses_sold_price + offer_price
         ; Now, let the buyer die
         die
       ][
-        print "Seller ask price is too high"
+    ;    print "Seller ask price is too high"
       ]
 
     ] [
-      print "No sellers with the same room type"
+    ;  print "No sellers with the same room type"
     ]
   ] [
-    print "No eligible sellers found"
+  ;  print "No eligible sellers found"
   ]
 end
 
@@ -745,18 +749,19 @@ to buyer-initiate-meeting_no_eip_no_governemnt
 
         ]
         set total_houses_sold total_houses_sold + 1
-
+        set total_houses_sold_per_tick total_houses_sold_per_tick + 1
+        set total_houses_sold_price total_houses_sold_price + offer_price
         ; Now, let the buyer die
         die
       ][
-        print "Seller ask price is too high"
+     ;   print "Seller ask price is too high"
       ]
 
     ] [
-      print "No sellers with the same room type"
+    ;  print "No sellers with the same room type"
     ]
   ] [
-    print "No eligible sellers found"
+   ; print "No eligible sellers found"
   ]
 end
 
@@ -808,7 +813,7 @@ to seller-selling-again
   ]
   ask sellers with [selling? = true][
     ask one-of sellers-here [
-      set selling? not selling?
+      set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
     ]
   ]
 
@@ -845,6 +850,7 @@ to avg_prices_by_race
   ] [
     set total_houses_sold_others_average 0
   ]
+  set total_houses_sold_average total_houses_sold_price / total_houses_sold
 
 end
 
@@ -1251,7 +1257,7 @@ eip_chinese
 eip_chinese
 0
 1
-0.6
+1.0
 0.1
 1
 NIL
@@ -1352,7 +1358,7 @@ inflation
 inflation
 0
 10
-2.0
+0.0
 0.1
 1
 %
@@ -1489,7 +1495,7 @@ income_growth
 income_growth
 0
 10
-2.0
+10.0
 0.1
 1
 %
@@ -1507,9 +1513,9 @@ Number of houses in the model
 
 PLOT
 1322
-660
+659
 1694
-899
+898
 Average Price of Houses
 Time
 Price
@@ -1525,9 +1531,9 @@ PENS
 
 PLOT
 911
-660
+658
 1300
-899
+897
 Number of Transactions
 time
 Transactions
@@ -1539,7 +1545,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
+"default" 1.0 0 -16777216 true "" "plot total_houses_sold_per_tick"
 
 @#$#@#$#@
 ## WHAT IS IT?
