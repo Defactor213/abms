@@ -1333,7 +1333,7 @@ TEXTBOX
 335
 179
 353
-Affodability
+Affordability
 14
 0.0
 1
