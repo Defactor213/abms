@@ -1,0 +1,26 @@
+"BehaviorSpace results (NetLogo 6.4.0)","Spreadsheet version 2.0"
+"Actual.nlogo"
+"Affordability"
+"03/29/2024 14:46:31:506 +0800"
+"min-pxcor","max-pxcor","min-pycor","max-pycor"
+"-100","100","-75","75"
+"[run number]","1","1","7","7","13","13"
+"density_of_hdb_blocks","1",,"1",,"1",
+"ethnic-integration_policy?","true",,"true",,"true",
+"family_grant_income_level","0",,"0",,"0",
+"eip_others","0.1",,"0.1",,"0.1",
+"inflation","0",,"0",,"0",
+"prob_of_first_timer","0.5",,"0.5",,"0.5",
+"eip_chinese","1",,"1",,"1",
+"prob_seller_selling","0.01",,"0.01",,"0.01",
+"income_growth","0",,"0.5",,"1",
+"government_policy?","true",,"true",,"true",
+"number_of_hdb_units","60",,"60",,"60",
+"eip_malay","0.2",,"0.2",,"0.2",
+"number_of_buyers","0",,"0",,"0",
+"paint-hdb-as","selling",,"selling",,"selling",
+"eip_indian","0.12",,"0.12",,"0.12",
+"[total steps]","50","50","50","50","50","50"
+
+"[final value]","[step]","total_houses_sold_average","[step]","total_houses_sold_average","[step]","total_houses_sold_average"
+,"50","325588.7200870011","50","343065.9215212743","50","331690.54348277504"
