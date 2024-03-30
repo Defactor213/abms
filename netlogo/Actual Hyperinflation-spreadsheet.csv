@@ -1,0 +1,24 @@
+"BehaviorSpace results (NetLogo 6.4.0)","Spreadsheet version 2.0"
+"Actual.nlogo"
+"Hyperinflation"
+"03/29/2024 22:17:07:440 +0800"
+"min-pxcor","max-pxcor","min-pycor","max-pycor"
+"-100","100","-75","75"
+"[run number]"
+"density_of_hdb_blocks",
+"inflation",
+"prob_of_first_timer",
+"prob_seller_selling",
+"income_growth",
+"government_policy?",
+"number_of_hdb_units",
+"number_of_buyers",
+"paint-hdb-as",
+"[reporter]"
+"[final]",
+"[min]",
+"[max]",
+"[mean]",
+"[total steps]",
+
+"[all run data]"

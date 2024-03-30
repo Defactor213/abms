@@ -1358,7 +1358,7 @@ inflation
 inflation
 0
 10
-0.0
+2.4
 0.1
 1
 %
@@ -1894,7 +1894,7 @@ NetLogo 6.4.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="Affordability" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="Stagnant" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <exitCondition>ticks &gt;= 50</exitCondition>
@@ -1902,32 +1902,74 @@ NetLogo 6.4.0
     <enumeratedValueSet variable="density_of_hdb_blocks">
       <value value="1"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="inflation">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_of_first_timer">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_seller_selling">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="income_growth">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_of_buyers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="paint-hdb-as">
+      <value value="&quot;selling&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Hyperinflation" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <exitCondition>ticks &gt;= 50</exitCondition>
+    <metric>total_houses_sold_average</metric>
+    <enumeratedValueSet variable="density_of_hdb_blocks">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="inflation">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_of_first_timer">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_seller_selling">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="income_growth">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="government_policy?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_of_hdb_units">
+      <value value="60"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_of_buyers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="paint-hdb-as">
+      <value value="&quot;selling&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="grant policy" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <exitCondition>ticks &gt;= 50</exitCondition>
+    <metric>total_houses_sold_average</metric>
     <enumeratedValueSet variable="ethnic-integration_policy?">
       <value value="true"/>
     </enumeratedValueSet>
+    <enumeratedValueSet variable="density_of_hdb_blocks">
+      <value value="1"/>
+    </enumeratedValueSet>
     <enumeratedValueSet variable="family_grant_income_level">
-      <value value="0"/>
-      <value value="10000"/>
-      <value value="20000"/>
       <value value="30000"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="eip_others">
       <value value="0.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="inflation">
-      <value value="0"/>
-      <value value="0.5"/>
-      <value value="1"/>
-      <value value="1.5"/>
-      <value value="2"/>
-      <value value="2.5"/>
-      <value value="3"/>
-      <value value="3.5"/>
-      <value value="4"/>
-      <value value="4.5"/>
-      <value value="5"/>
-      <value value="7"/>
-      <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="prob_of_first_timer">
       <value value="0.5"/>
@@ -1937,24 +1979,69 @@ NetLogo 6.4.0
     </enumeratedValueSet>
     <enumeratedValueSet variable="prob_seller_selling">
       <value value="0.01"/>
-      <value value="0.02"/>
-      <value value="0.05"/>
-      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="inflation">
+      <value value="0.5"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="income_growth">
-      <value value="0"/>
       <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="government_policy?">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_of_hdb_units">
+      <value value="60"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="eip_malay">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_of_buyers">
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="paint-hdb-as">
+      <value value="&quot;selling&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="eip_indian">
+      <value value="0.12"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Ethnic policy" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <exitCondition>ticks &gt;= 50</exitCondition>
+    <metric>total_houses_sold_chinese_average</metric>
+    <metric>total_houses_sold_indian_average</metric>
+    <metric>total_houses_sold_malay_average</metric>
+    <metric>total_houses_sold_others_average</metric>
+    <metric>total_houses_sold_average</metric>
+    <enumeratedValueSet variable="ethnic-integration_policy?">
+      <value value="true"/>
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="density_of_hdb_blocks">
       <value value="1"/>
-      <value value="1.5"/>
-      <value value="2"/>
-      <value value="2.5"/>
-      <value value="3"/>
-      <value value="3.5"/>
-      <value value="4"/>
-      <value value="4.5"/>
-      <value value="5"/>
-      <value value="7"/>
-      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="family_grant_income_level">
+      <value value="30000"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="eip_others">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="inflation">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_of_first_timer">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="eip_chinese">
+      <value value="1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob_seller_selling">
+      <value value="0.01"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="income_growth">
+      <value value="0.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="government_policy?">
       <value value="true"/>
@@ -1966,11 +2053,6 @@ NetLogo 6.4.0
       <value value="0.2"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="number_of_buyers">
-      <value value="0"/>
-      <value value="20"/>
-      <value value="40"/>
-      <value value="50"/>
-      <value value="80"/>
       <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="paint-hdb-as">
