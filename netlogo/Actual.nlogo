@@ -26,6 +26,7 @@ globals[
   buyer_family_constant
   buyer_lease_constant
   buyer_constant
+  affordability
 
 ]
 breed [sellers seller]
@@ -449,6 +450,7 @@ to setup-buyers [num_to_create]
     ; Assigning position to buyer on the selected red patch
     move-to selected-patch
   ]
+  set affordability total_houses_sold_average / mean [income] of buyers
 end
 
 ; The main simulation loop
@@ -485,11 +487,11 @@ to go
   avg_prices_by_race
   ;; update-mean-offer-price-histogram
 
-  if ticks mod 2 = 0 [
+  if ticks mod 6 = 0 [
     ask buyers [
-      set income (income * (1 + income_growth))
+      set income (income * (1 + income_growth / 2))
     ]
-    set mean_house_price (mean_house_price * (1 + inflation))
+    set mean_house_price (mean_house_price * (1 + inflation / 2))
   ]
 
   setup-buyers number_of_buyers
@@ -498,7 +500,7 @@ end
 
 to decrease_lease_year
   ask sellers [
-    set lease_years lease_years - 6
+    set lease_years lease_years - 0.833333
     if lease_years = 0 [
       set lease_years 99
     ]
@@ -1387,7 +1389,7 @@ inflation
 inflation
 0
 10
-2.4
+2.0
 0.1
 1
 %
@@ -1402,7 +1404,7 @@ number_of_buyers
 number_of_buyers
 0
 300
-220.0
+100.0
 5
 1
 NIL
@@ -1524,7 +1526,7 @@ income_growth
 income_growth
 0
 10
-2.6
+2.3
 0.1
 1
 %
@@ -1575,6 +1577,24 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot total_houses_sold_per_tick"
+
+PLOT
+536
+570
+882
+799
+Affordability (Mean house prices / mean income)
+Ticks
+Years needed to pay off a house
+0.0
+10.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"Affordability" 1.0 0 -13345367 true "" "plot affordability"
 
 @#$#@#$#@
 ## WHAT IS IT?
