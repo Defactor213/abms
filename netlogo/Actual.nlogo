@@ -390,13 +390,6 @@ end
 ; Creating buyer agents
 to setup-buyers [num_to_create]
 
-  let income-brackets [
-      ["HDB 1- & 2-Room Flats" 1879 0.056]
-      ["HDB 3-Room Flats" 4800 0.244]
-      ["HDB 4-Room Flats" 6483 0.388]
-      ["HDB 5-Room & Executive Flats" 9186 0.312]
-    ]
-
   create-buyers num_to_create ; Adjust the number of buyers as needed
   [
     set shape "person"
