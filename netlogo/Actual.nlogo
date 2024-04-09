@@ -18,6 +18,15 @@ globals[
   total_houses_sold_others_price
   total_houses_sold_others_average
   mean_house_price
+  seller_house_constant
+  seller_lease_year_constant
+  seller_constant
+  buyer_house_constant
+  buyer_neighborhood_constant
+  buyer_family_constant
+  buyer_lease_constant
+  buyer_constant
+
 ]
 breed [sellers seller]
 breed [buyers buyer]
@@ -48,6 +57,8 @@ to setup
   clear-output
   setup-house-price
   setup-hdb
+  setup-seller-constant
+  setup-buyer-constant
   setup-buyers 100
   reset-ticks
 end
@@ -78,6 +89,34 @@ to setup-house-price
   ;; starting mean price from jan 2017
   set mean_house_price 427506.984
 end
+
+to setup-seller-constant
+  ; Mean values for the constants
+  let seller_constant1_mean 0.946
+  let seller_constant2_mean 0.00887
+  let seller_constant3_mean -0.0144
+
+  ; Generate normally distributed constants
+  set seller_house_constant generate-normal seller_constant1_mean (seller_constant1_mean * 0.01)
+  set seller_lease_year_constant generate-normal seller_constant2_mean (seller_constant2_mean * 0.01)
+  set seller_constant generate-normal seller_constant3_mean (abs(seller_constant3_mean) * 0.01)
+
+end
+to setup-buyer-constant
+  ; Generate normally distributed constants with 1% STD
+  set buyer_house_constant generate-normal 0.902 (0.902 * 0.01)
+  set buyer_neighborhood_constant generate-normal 0.0132 (0.0132 * 0.01)
+  set buyer_family_constant generate-normal 0.235 (0.235 * 0.01)
+  set buyer_lease_constant generate-normal 0.00603 (0.00603 * 0.01)
+  set buyer_constant generate-normal -0.263 (abs(-0.263) * 0.01)
+end
+
+
+to-report generate-normal [average stddev]
+  ; NetLogo's random-normal function generates a normally distributed random float
+  report random-normal average stddev
+end
+
 
 ; Setup the sellers
 to setup-sellers_paint [num-sellers selling_variable]
@@ -134,7 +173,7 @@ to setup-sellers_paint [num-sellers selling_variable]
     ]
 
     ; set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
-    set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
+    set ask-price exp((seller_house_constant * ln(mean_house_price) + seller_lease_year_constant * lease_years) + seller_constant)
 
     ifelse selling_variable = "selling"[
       set selling? true
@@ -273,8 +312,8 @@ to setup-sellers [num-sellers]
       ]
     ]
 
-    ;set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
-    set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
+    set ask-price exp((seller_house_constant * ln(mean_house_price) + seller_lease_year_constant * lease_years) + seller_constant)
+
 
     let selling_var? random-float 1.0 < prob_seller_selling
 
@@ -392,8 +431,7 @@ to setup-buyers [num_to_create]
         ; -----------TO CHANGE
     ; Determine the offer price of the buyer
     ; let my-offer-price random 980000 + 20000
-    let my-offer-price exp((0.902 * ln(mean_house_price)) + (0.0132 * neighborhood_score) + (0.235 * family_size) + (0.00603 * remaining-lease) - 0.263)
-
+    let my-offer-price exp((buyer_house_constant * ln(mean_house_price)) + (buyer_neighborhood_constant * neighborhood_score) + (buyer_family_constant * family_size) + (buyer_lease_constant * remaining-lease) - buyer_constant)
 
 
     ; Assigning initialized attributes to each buyer
@@ -439,6 +477,8 @@ to go
       ]
     ]
   ]
+  setup-seller-constant
+  setup-buyer-constant
   tick
   decrease_lease_year
   seller-selling-again
@@ -807,13 +847,13 @@ to seller-selling-again
 
 
         ;set ask-price (random-float 100) + 100 ; set the ask price of the house
-        set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
+        set ask-price exp((seller_house_constant * ln(mean_house_price) + seller_lease_year_constant * lease_years) + seller_constant)
       ]
     ]
   ]
   ask sellers with [selling? = true][
     ask one-of sellers-here [
-      set ask-price exp((0.946 * ln(mean_house_price) + 0.00887 * lease_years) - 0.0144)
+      set ask-price exp((seller_house_constant * ln(mean_house_price) + seller_lease_year_constant * lease_years) + seller_constant)
     ]
   ]
 
@@ -933,17 +973,6 @@ to-report enhanced_housing_grant [fam_income]
     ]
   ]
 end
-
-
-; Additional functions to simulate buyer and seller interactions, transactions,
-; and the effects of government policies will be needed here.
-
-; For example:
-; to simulate-transactions
-; to apply-government-policies
-
-; This foundational model needs to be expanded with real data integration and
-; more detailed interactions based on the project proposal.
 @#$#@#$#@
 GRAPHICS-WINDOW
 275
@@ -1242,7 +1271,7 @@ family_grant_income_level
 family_grant_income_level
 0
 30000
-30000.0
+16000.0
 1000
 1
 NIL
@@ -1257,7 +1286,7 @@ eip_chinese
 eip_chinese
 0
 1
-1.0
+0.8
 0.1
 1
 NIL
@@ -1372,9 +1401,9 @@ SLIDER
 number_of_buyers
 number_of_buyers
 0
-100
-100.0
-1
+300
+220.0
+5
 1
 NIL
 HORIZONTAL
@@ -1413,7 +1442,7 @@ number_of_hdb_units
 number_of_hdb_units
 10
 100
-60.0
+100.0
 1
 1
 NIL
@@ -1443,7 +1472,7 @@ density_of_hdb_blocks
 density_of_hdb_blocks
 0
 1
-1.0
+0.75
 0.05
 1
 NIL
@@ -1495,7 +1524,7 @@ income_growth
 income_growth
 0
 10
-9.9
+2.6
 0.1
 1
 %
