@@ -27,7 +27,10 @@ globals[
   buyer_lease_constant
   buyer_constant
   affordability
-
+  affordability_2
+  affordability_3
+  affordability_4
+  affordability_5
 ]
 breed [sellers seller]
 breed [buyers buyer]
@@ -352,6 +355,38 @@ to-report pick-race [c-chinese max-chinese c-indian max-indian c-malay max-malay
   ]
 end
 
+to calculate-affordability
+  ; Calculate average income for each family size category
+  let avg_income_2 mean [income] of buyers with [family_size <= 2]
+  let avg_income_3 mean [income] of buyers with [family_size = 3]
+  let avg_income_4 mean [income] of buyers with [family_size = 4]
+  let avg_income_5 mean [income] of buyers with [family_size >= 5]
+
+  ; Calculate and store affordability for each category
+  ; Ensure that you do not divide by zero if there are no buyers in a category
+  ifelse avg_income_2 > 0 [
+    set affordability_2 (total_houses_sold_average / avg_income_2) / 12
+  ][
+    set affordability_2 0
+  ]
+  ifelse avg_income_3 > 0 [
+    set affordability_3 (total_houses_sold_average / avg_income_3) / 12
+  ][
+    set affordability_3 0
+  ]
+  ifelse avg_income_4 > 0 [
+    set affordability_4 (total_houses_sold_average / avg_income_4) / 12
+  ][
+    set affordability_4 0
+  ]
+  ifelse avg_income_5 > 0 [
+    set affordability_5 (total_houses_sold_average / avg_income_5) / 12
+  ][
+    set affordability_5 0
+  ]
+end
+
+
 ; Creating buyer agents
 to setup-buyers [num_to_create]
 
@@ -412,26 +447,24 @@ to setup-buyers [num_to_create]
     ]
     let my-income 0
     ifelse (my-family-size <= 2)[
-      let std-deviation 0.1 * 1879
-      set my-income random-normal 1879 std-deviation
+      let std-deviation 0.1 * 2748
+      set my-income random-normal 2748 std-deviation
     ][
       ifelse (my-family-size <= 3) [
-        let std-deviation 0.1 * 4800
-        set my-income random-normal 4800 std-deviation
+        let std-deviation 0.1 * 6450
+        set my-income random-normal 6450 std-deviation
       ] [
         ifelse (my-family-size <= 4) [
-          let std-deviation 0.1 * 6483
-          set my-income random-normal 6483 std-deviation
+          let std-deviation 0.1 * 9260
+          set my-income random-normal 9260 std-deviation
         ] [
-          let std-deviation 0.1 * 9186
-          set my-income random-normal 9186 std-deviation
+          let std-deviation 0.1 * 12554
+          set my-income random-normal 12554 std-deviation
         ]
       ]
     ]
     let remaining-lease random 50 + 50
-        ; -----------TO CHANGE
-    ; Determine the offer price of the buyer
-    ; let my-offer-price random 980000 + 20000
+
     let my-offer-price exp((buyer_house_constant * ln(mean_house_price)) + (buyer_neighborhood_constant * neighborhood_score) + (buyer_family_constant * family_size) + (buyer_lease_constant * remaining-lease) - buyer_constant)
 
 
@@ -450,7 +483,8 @@ to setup-buyers [num_to_create]
     ; Assigning position to buyer on the selected red patch
     move-to selected-patch
   ]
-  set affordability total_houses_sold_average / mean [income] of buyers
+  calculate-affordability
+;  set affordability total_houses_sold_average / mean [income] of buyers / 12
 end
 
 ; The main simulation loop
@@ -1579,22 +1613,25 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot total_houses_sold_per_tick"
 
 PLOT
-536
-570
-882
-799
+383
+572
+885
+896
 Affordability (Mean house prices / mean income)
 Ticks
 Years needed to pay off a house
 0.0
 10.0
 0.0
-100.0
+10.0
 true
-false
+true
 "" ""
 PENS
-"Affordability" 1.0 0 -13345367 true "" "plot affordability"
+"Family Size <= 2" 1.0 0 -13345367 true "" "plot affordability_2"
+"Family Size = 3" 1.0 0 -13840069 true "" "plot affordability_3"
+"Family Size = 4" 1.0 0 -2674135 true "" "plot affordability_4"
+"amily Size >= 5" 1.0 0 -6459832 true "" "plot affordability_5"
 
 @#$#@#$#@
 ## WHAT IS IT?
