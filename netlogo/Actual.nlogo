@@ -459,7 +459,7 @@ to setup-buyers [num_to_create]
     ]
     let remaining-lease random 50 + 50
 
-    let my-offer-price exp((buyer_house_constant * ln(mean_house_price)) + (buyer_family_constant * family_size) + (buyer_lease_constant * remaining-lease) + (buyer_lease_constant * my-income) - buyer_constant)
+    let my-offer-price exp((buyer_house_constant * ln(mean_house_price)) + (buyer_family_constant * family_size) + (buyer_lease_constant * remaining-lease) + (buyer_lease_constant * my-income) + buyer_constant)
 
 
     ; Assigning initialized attributes to each buyer
