@@ -113,7 +113,7 @@ to setup-buyer-constant
   set buyer_lease_constant generate-normal 0.006349 (0.006349 * 0.01)
   set buyer_income_constant generate-normal 0.000013 (0.000013 * 0.01)
 
-  set buyer_constant generate-normal -1.5865776275 (abs(-1.5865776275) * 0.01)
+  set buyer_constant generate-normal -1.5865776275 (1.5865776275 * 0.01)
 end
 
 
@@ -177,8 +177,8 @@ to setup-sellers_paint [num-sellers selling_variable]
       ]
     ]
 
-    ; set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
-    set ask-price exp((seller_house_constant * ln(mean_house_price) + seller_lease_year_constant * lease_years) + seller_constant)
+     set ask-price (random-float 100) + 100  ; Example: random ask-price between 100 and 200
+    ;set ask-price exp((seller_house_constant * ln(mean_house_price) + seller_lease_year_constant * lease_years) + seller_constant)
 
     ifelse selling_variable = "selling"[
       set selling? true
@@ -358,6 +358,7 @@ end
 
 to calculate-affordability
   ; Calculate average income for each family size category
+  let avg_income mean [income] of buyers
   let avg_income_2 mean [income] of buyers with [family_size <= 2]
   let avg_income_3 mean [income] of buyers with [family_size = 3]
   let avg_income_4 mean [income] of buyers with [family_size = 4]
@@ -365,6 +366,7 @@ to calculate-affordability
 
   ; Calculate and store affordability for each category
   ; Ensure that you do not divide by zero if there are no buyers in a category
+  set affordability total_houses_sold_average / avg_income / 12
   ifelse avg_income_2 > 0 [
     set affordability_2 (total_houses_sold_average / avg_income_2) / 12
   ][
@@ -459,8 +461,8 @@ to setup-buyers [num_to_create]
     ]
     let remaining-lease random 50 + 50
 
-    let my-offer-price exp((buyer_house_constant * ln(mean_house_price)) + (buyer_family_constant * family_size) + (buyer_lease_constant * remaining-lease) + (buyer_lease_constant * my-income) + buyer_constant)
-
+    let my-offer-price buyer_house_constant * ln mean_house_price + buyer_family_constant * family_size + buyer_lease_constant * remaining-lease + buyer_income_constant * my-income + buyer_constant
+    set my-offer-price exp(my-offer-price)
 
     ; Assigning initialized attributes to each buyer
     set race my-race
@@ -1261,9 +1263,9 @@ total_houses_sold_others
 11
 
 PLOT
-908
+909
 459
-1341
+1342
 639
 Average Price of houses by ethnicity 
 NIL
@@ -1626,6 +1628,7 @@ PENS
 "Family Size = 3" 1.0 0 -13840069 true "" "plot affordability_3"
 "Family Size = 4" 1.0 0 -2674135 true "" "plot affordability_4"
 "amily Size >= 5" 1.0 0 -6459832 true "" "plot affordability_5"
+"Average" 1.0 0 -7500403 true "" "plot affordability"
 
 @#$#@#$#@
 ## WHAT IS IT?
