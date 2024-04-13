@@ -22,7 +22,6 @@ globals[
   seller_lease_year_constant
   seller_constant
   buyer_house_constant
-  buyer_neighborhood_constant
   buyer_family_constant
   buyer_lease_constant
   buyer_income_constant
@@ -109,13 +108,12 @@ to setup-seller-constant
 end
 to setup-buyer-constant
   ; Generate normally distributed constants with 1% STD
-  set buyer_house_constant generate-normal 0.874560 (0.874560 * 0.01)
-  set buyer_neighborhood_constant generate-normal 0.016223 (0.016223 * 0.01)
-  set buyer_family_constant generate-normal 0.214332 (0.214332 * 0.01)
-  set buyer_lease_constant generate-normal 0.006456 (0.006456 * 0.01)
-  set buyer_income_constant generate-normal 0.000012 (0.000012 * 0.01)
+  set buyer_house_constant generate-normal 1.007892 (1.007892 * 0.01)
+  set buyer_family_constant generate-normal 0.206993 (0.206993 * 0.01)
+  set buyer_lease_constant generate-normal 0.006349 (0.006349 * 0.01)
+  set buyer_income_constant generate-normal 0.000013 (0.000013 * 0.01)
 
-  set buyer_constant generate-normal -0.2876118024 (abs(-0.2876118024) * 0.01)
+  set buyer_constant generate-normal -1.5865776275 (abs(-1.5865776275) * 0.01)
 end
 
 
@@ -461,7 +459,7 @@ to setup-buyers [num_to_create]
     ]
     let remaining-lease random 50 + 50
 
-    let my-offer-price exp((buyer_house_constant * ln(mean_house_price)) + (buyer_neighborhood_constant * neighborhood_score) + (buyer_family_constant * family_size) + (buyer_lease_constant * remaining-lease) + (buyer_lease_constant * my-income) - buyer_constant)
+    let my-offer-price exp((buyer_house_constant * ln(mean_house_price)) + (buyer_family_constant * family_size) + (buyer_lease_constant * remaining-lease) + (buyer_lease_constant * my-income) - buyer_constant)
 
 
     ; Assigning initialized attributes to each buyer
