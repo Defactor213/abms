@@ -1419,7 +1419,7 @@ inflation
 inflation
 0
 10
-2.0
+1.0
 0.1
 1
 %
@@ -1434,7 +1434,7 @@ number_of_buyers
 number_of_buyers
 100
 5000
-2500.0
+100.0
 100
 1
 NIL
@@ -1449,7 +1449,7 @@ prob_seller_selling
 prob_seller_selling
 0
 0.1
-0.05
+0.01
 0.01
 1
 NIL
@@ -1556,7 +1556,7 @@ income_growth
 income_growth
 0
 10
-2.3
+2.0
 0.1
 1
 %
@@ -1980,21 +1980,44 @@ NetLogo 6.4.0
   <experiment name="find buyer seller balance" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <exitCondition>ticks &gt; 24</exitCondition>
+    <exitCondition>ticks &gt; 12</exitCondition>
     <metric>total_houses_sold_per_tick</metric>
     <enumeratedValueSet variable="prob_seller_selling">
       <value value="0.02"/>
       <value value="0.04"/>
       <value value="0.06"/>
-      <value value="0.08"/>
-      <value value="0.1"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="number_of_buyers">
       <value value="1000"/>
       <value value="2000"/>
       <value value="3000"/>
-      <value value="4000"/>
-      <value value="5000"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="find affordabilty variables balance" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <exitCondition>ticks &gt; 12</exitCondition>
+    <metric>total_houses_sold_average</metric>
+    <enumeratedValueSet variable="inflation">
+      <value value="0.9"/>
+      <value value="1"/>
+      <value value="1.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="income_growth">
+      <value value="1.5"/>
+      <value value="1.8"/>
+      <value value="2"/>
+      <value value="2.2"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="government policy" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <exitCondition>ticks &gt;= 24</exitCondition>
+    <metric>total_houses_sold_average</metric>
+    <enumeratedValueSet variable="government_policy?">
+      <value value="true"/>
+      <value value="false"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
