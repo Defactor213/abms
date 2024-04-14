@@ -63,7 +63,7 @@ to setup
   setup-hdb
   setup-seller-constant
   setup-buyer-constant
-  setup-buyers 100
+  setup-buyers number_of_buyers
   reset-ticks
 end
 
@@ -1432,10 +1432,10 @@ SLIDER
 53
 number_of_buyers
 number_of_buyers
-0
-300
-100.0
-5
+100
+5000
+2500.0
+100
 1
 NIL
 HORIZONTAL
@@ -1449,7 +1449,7 @@ prob_seller_selling
 prob_seller_selling
 0
 0.1
-0.01
+0.05
 0.01
 1
 NIL
@@ -1977,172 +1977,24 @@ NetLogo 6.4.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="Stagnant" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="find buyer seller balance" repetitions="1" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
-    <exitCondition>ticks &gt;= 50</exitCondition>
-    <metric>total_houses_sold_average</metric>
-    <enumeratedValueSet variable="density_of_hdb_blocks">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="inflation">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="prob_of_first_timer">
-      <value value="0.5"/>
-    </enumeratedValueSet>
+    <exitCondition>ticks &gt; 24</exitCondition>
+    <metric>total_houses_sold_per_tick</metric>
     <enumeratedValueSet variable="prob_seller_selling">
-      <value value="0.01"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="income_growth">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number_of_buyers">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="paint-hdb-as">
-      <value value="&quot;selling&quot;"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Hyperinflation" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <exitCondition>ticks &gt;= 50</exitCondition>
-    <metric>total_houses_sold_average</metric>
-    <enumeratedValueSet variable="density_of_hdb_blocks">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="inflation">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="prob_of_first_timer">
-      <value value="0.5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="prob_seller_selling">
-      <value value="0.01"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="income_growth">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="government_policy?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number_of_hdb_units">
-      <value value="60"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number_of_buyers">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="paint-hdb-as">
-      <value value="&quot;selling&quot;"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="grant policy" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <exitCondition>ticks &gt;= 50</exitCondition>
-    <metric>total_houses_sold_average</metric>
-    <enumeratedValueSet variable="ethnic-integration_policy?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="density_of_hdb_blocks">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="family_grant_income_level">
-      <value value="30000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_others">
+      <value value="0.02"/>
+      <value value="0.04"/>
+      <value value="0.06"/>
+      <value value="0.08"/>
       <value value="0.1"/>
     </enumeratedValueSet>
-    <enumeratedValueSet variable="prob_of_first_timer">
-      <value value="0.5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_chinese">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="prob_seller_selling">
-      <value value="0.01"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="inflation">
-      <value value="0.5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="income_growth">
-      <value value="0.5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="government_policy?">
-      <value value="true"/>
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number_of_hdb_units">
-      <value value="60"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_malay">
-      <value value="0.2"/>
-    </enumeratedValueSet>
     <enumeratedValueSet variable="number_of_buyers">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="paint-hdb-as">
-      <value value="&quot;selling&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_indian">
-      <value value="0.12"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Ethnic policy" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <exitCondition>ticks &gt;= 50</exitCondition>
-    <metric>total_houses_sold_chinese_average</metric>
-    <metric>total_houses_sold_indian_average</metric>
-    <metric>total_houses_sold_malay_average</metric>
-    <metric>total_houses_sold_others_average</metric>
-    <metric>total_houses_sold_average</metric>
-    <enumeratedValueSet variable="ethnic-integration_policy?">
-      <value value="true"/>
-      <value value="false"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="density_of_hdb_blocks">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="family_grant_income_level">
-      <value value="30000"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_others">
-      <value value="0.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="inflation">
-      <value value="0.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="prob_of_first_timer">
-      <value value="0.5"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_chinese">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="prob_seller_selling">
-      <value value="0.01"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="income_growth">
-      <value value="0.1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="government_policy?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number_of_hdb_units">
-      <value value="60"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_malay">
-      <value value="0.2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="number_of_buyers">
-      <value value="100"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="paint-hdb-as">
-      <value value="&quot;selling&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="eip_indian">
-      <value value="0.12"/>
+      <value value="1000"/>
+      <value value="2000"/>
+      <value value="3000"/>
+      <value value="4000"/>
+      <value value="5000"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
